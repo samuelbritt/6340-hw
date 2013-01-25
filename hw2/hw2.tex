@@ -1,0 +1,467 @@
+\documentclass{article}
+
+\usepackage[osf]{mathpazo}
+\usepackage{microtype}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{mathtools}
+\usepackage{bm}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{enumitem}
+\usepackage[alsoload=binary]{siunitx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{fancyvrb}
+\usepackage[section]{placeins}
+\usepackage{flafter}
+\usepackage[backgroundcolor=orange!30,bordercolor=none]{todonotes}
+\usepackage{pdfpages}
+\usepackage[hmargin=1in]{geometry}
+\usepackage{url}
+\usepackage{hyperref}
+
+% no section numbers
+\setcounter{secnumdepth}{-2}
+\pagestyle{empty}
+
+% a bit more compact, and fixes spacing issues
+\let\originalleft\left
+\let\originalright\right
+\renewcommand{\l}{\mathopen{}\mathclose\bgroup\originalleft}
+\renewcommand{\r}{\aftergroup\egroup\originalright}
+
+% commands
+\renewcommand\vec[1]{\bm{#1}}
+\renewcommand\epsilon{\varepsilon}
+\newcommand\bit{\ensuremath{\set{0,1}}}
+\newcommand\abs[1]{\l\vert #1 \r\vert}
+\newcommand\set[1]{\l{ #1 \r}}
+
+% write in code
+\DefineShortVerb{\|}
+
+\usetikzlibrary
+{
+  positioning,
+  calc,
+  intersections,
+  arrows,
+  shapes.misc,
+}
+
+% redefine `\to` to use tikz arrows
+\renewcommand\to{%
+  \mathbin{\tikz[baseline=-.7ex] \draw[->] (0,0) -- +(.4,0);}%
+}
+
+\tikzset
+  {
+    ->,
+    >=latex',
+    shorten >=.5pt,
+    node distance=.5cm and .7cm,
+    auto,
+    wide fork/.style= {node distance=.5cm and 1.2cm},
+    block/.style=
+      {
+        draw,
+        inner sep=.3em,
+        rounded rectangle,
+        minimum size=1.7em,
+      },
+    terminal/.style=
+      {
+        block,
+        rectangle,
+        text height=1.5ex,
+        text depth=.25ex,
+      },
+    inline center/.style={baseline=-.5ex},
+    retreating/.style={dashed},
+    cross/.style={dashdotted},
+    forward/.style={dotted},
+  }
+
+\begin{document}
+
+\includepdf
+  [
+    pages=1,
+    pagecommand=
+      {
+        \begin{tikzpicture}[remember picture, overlay]
+          \node[text width=6.2in, text height=2.3in]
+          at (current page.north east) {\large Sam Britt};
+        \end{tikzpicture}
+      }
+  ]
+  {Assignment2ProblemSet1}
+
+\noindent
+Sam Britt     \hfill CS 6340      \\
+Jan. 19, 2013 \hfill Assignment 2 \\
+
+\begin{enumerate}
+  \item The CFGs are below. A join node, J, has been added for
+    clarity.
+
+    \begin{minipage}[t]{\linewidth}
+      \begin{minipage}[t]{.5\linewidth}
+        \centering
+        \begin{minipage}[t]{.6\linewidth}
+          \begin{center}
+            \begin{tikzpicture}
+              \node[terminal]                   (E) {entry, 1, 2};
+              \node[block,below=of E]           (3) {3};
+              \node[block,below left=of 3]      (4) {4, 5};
+              \node[block,below left=of 4]      (7) {7, 8};
+              \node[terminal,below right=of 4] (12) {12, exit};
+              \node[block,below left=of 7]     (10) {10};
+              \node[block,below right=of 10]    (J) {J};
+
+              \path (E) edge                           (3);
+              \path (3) edge            node[swap] {T} (4)
+                        edge[bend left] node       {F} (12);
+              \path (4) edge            node[swap] {F} (7)
+                        edge            node       {T} (12);
+              \path (7) edge            node[swap] {F} (10)
+                        edge[bend left] node       {T} (J);
+              \path (10) edge                          (J);
+
+              \node[node distance=.3cm,left=of 10,coordinate] (a) {};
+              \draw (J) -| (a) |- (3);
+            \end{tikzpicture}
+          \end{center}
+          CFG using maximal basic blocks.
+        \end{minipage}
+      \end{minipage}
+      %
+      \begin{minipage}[t]{.5\linewidth}
+        \centering
+        \begin{minipage}[t]{.6\linewidth}
+          \begin{center}
+            \begin{tikzpicture}
+              \node[terminal]               (E) {entry};
+              \node[block,below=of E]       (1)  {1};
+              \node[block,below=of 1]       (2)  {2};
+              \node[block,below=of 2]       (3)  {3};
+              \node[block,below left=of 3]  (4)  {4};
+              \node[block,below=of 4]       (5)  {5};
+              \node[block,below left=of 5]  (7)  {7};
+              \node[block,below right=of 5](12) {12};
+              \node[block,below=of 7]       (8)  {8};
+              \node[block,below left=of 8] (10) {10};
+              \node[block,below right=of 10](J)  {J};
+              \node[terminal,below=of 12]   (X) {exit};
+
+              \path (E) edge (1);
+              \path (1) edge (2);
+              \path (2) edge (3);
+              \path (3) edge node[swap] {T} (4)
+                        edge[bend left] node {F} (12);
+              \path (12) edge (X);
+              \path (4) edge (5);
+              \path (5) edge node[swap] {F} (7)
+                        edge node {T} (12);
+              \path (7) edge (8);
+              \path (8) edge node[swap] {F} (10)
+                        edge[bend left] node {T} (J);
+              \path (10) edge (J);
+
+              \node[node distance=.3cm,left=of 10,coordinate] (a) {};
+              \draw (J) -| (a) |- (3);
+            \end{tikzpicture}
+          \end{center}
+          CFG using one statement per block.
+        \end{minipage}
+      \end{minipage}
+    \end{minipage}
+
+    \newpage
+  \item
+    \begin{enumerate}
+      \item The dominator and postdominator trees are below.
+
+        \begin{minipage}[t]{\linewidth}
+          \begin{minipage}[t]{.5\linewidth}
+            \centering
+            \begin{minipage}[t]{.4\linewidth}
+              \begin{center}
+                \begin{tikzpicture}
+                  \node[terminal]               (E) {entry};
+                  \node[block,below=of E]       (1)  {1};
+                  \node[block,below=of 1]       (2)  {2};
+                  \node[block,below=of 2]       (3)  {3};
+                  \node[block,below left=of 3]  (4)  {4};
+                  \node[block,below=of 4]       (5)  {5};
+                  \node[block,below=of 5]       (7)  {7};
+                  \node[block,below=of 7]       (8)  {8};
+                  \node[block,below=of 8]      (10) {10};
+                  \node[block,below right=of 3](12) {12};
+                  \node[terminal,below=of 12]   (X) {exit};
+
+                  \path (E) edge (1);
+                  \path (1) edge (2);
+                  \path (2) edge (3);
+                  \path (3) edge (4) edge (12);
+                  \path (4) edge (5);
+                  \path (5) edge (7);
+                  \path (7) edge (8);
+                  \path (8) edge (10);
+                  \path (12) edge (X);
+                \end{tikzpicture}
+              \end{center}
+              Dominator tree.
+            \end{minipage}
+          \end{minipage}
+          %
+          \begin{minipage}[t]{.5\linewidth}
+            \centering
+            \begin{minipage}[t]{.8\linewidth}
+              \begin{center}
+                \begin{tikzpicture}
+                  \node[terminal]               (X) {exit};
+                  \node[block,below=of X]      (12) {12};
+                  \node[block,wide fork,below left=of 12] (5)  {5};
+                  \node[block,below right=of 5]       (4)  {4};
+                  \node[block,below  left=of 5]       (7)  {7};
+                  \node[block,wide fork,below right=of 12](3)  {3};
+
+                  \node[block,below left=of 3] (10) {10};
+                  \node[block,below=of 3]       (8)  {8};
+                  \node[block,below right=of 3] (2)  {2};
+                  \node[block,below=of 2]       (1)  {1};
+                  \node[terminal,below=of 1]    (E)  {entry};
+
+                  \path (X) edge (12);
+                  \path (12) edge (5) edge (3);
+                  \path (5) edge (7) edge (4);
+                  \path (3) edge (10) edge (8) edge (2);
+                  \path (2) edge (1);
+                  \path (1) edge (E);
+
+                \end{tikzpicture}
+              \end{center}
+              Postdominator tree.
+            \end{minipage}
+          \end{minipage}
+        \end{minipage}
+
+      \item Yes, the graph is reducible. First, many nodes have a
+        single predecessor, so T2 analysis combines many of the nodes:
+
+        \begin{center}
+          \begin{tikzpicture}
+            \node[terminal]               (E) {entry, 1, 2};
+            \node[block,below=of E]       (3) {3};
+            \node[block,below  left=of 3] (4) {4--8, 10};
+            \node[block,below right=of 3](12) {12, exit};
+
+            \path (E) edge (3);
+            \path (3) edge (4)
+                      edge (12);
+            \path (4) edge (12);
+
+            \node[node distance=.3cm,left=of 4,coordinate] (a) {};
+            \draw (4) -| (a) |- (3);
+          \end{tikzpicture}
+        \end{center}
+        Again applying a T2 transformation:
+        \begin{center}
+          \begin{tikzpicture}
+            \node[terminal]               (E) {entry, 1, 2};
+            \node[block,below=of E]       (3) {3--8, 10};
+            \node[block,below right=of 3](12) {12, exit};
+
+            \path (E) edge (3);
+            \path (3) edge (12);
+            \path (3) edge[loop left] (3);
+          \end{tikzpicture}
+        \end{center}
+        Applying a T1 transformation to get rid of the self loop and a
+        T2 transformation to collapse the node containing the exit
+        statement leaves:
+        \begin{center}
+          \begin{tikzpicture}
+            \node[terminal]               (E) {entry, 1, 2};
+            \node[block,below=of E]       (3) {3--8, 10, 12, exit};
+
+            \path (E) edge (3);
+          \end{tikzpicture}
+        \end{center}
+        And finally, a T1 transformation collapses this flow graph to
+        a single node, thus showing that the original CFG is indeed
+        reducible.
+        \begin{center}
+          \begin{tikzpicture}
+            \node[terminal, draw] (E) {entry, 1--8, 10, 12, exit};
+          \end{tikzpicture}
+        \end{center}
+
+      \item One version of the dept-first presentation is below.
+        Retreating edges are marked by dashes
+        (\tikz[inline center] \draw[retreating] (0,0) -- (.7,0);)
+        and forward edges are marked by dots
+        (\tikz[inline center] \draw[forward] (0,0) -- (.7,0);).
+        The depth of this graph is $1$. The paths $10 \to 3$ or $8 \to
+        3$ are both acyclic paths, each containing one reverse edge.
+        Another path with more reverse edges cannot be found. (In
+        fact, because both back edges have the same head node, they
+        are in the same loop.)
+
+        \begin{center}
+          \begin{minipage}[t]{.53\linewidth}
+            \begin{center}
+              \begin{tikzpicture}[on grid, node distance=1.2cm]
+                \node[terminal]                 (E)  {entry};
+                \node[block,below left=of E]    (1)  {1};
+                \node[block,below left=of 1]    (2)  {2};
+                \node[block,below left=of 2]    (3)  {3};
+                \node[block,below left=of 3]    (4)  {4};
+                \node[block,below left=of 4]    (5)  {5};
+                \node[block,below left=of 5]    (7)  {7};
+                \node[block,below left=of 7]    (8)  {8};
+                \node[block,below left=of 8]   (10) {10};
+
+                \node[block,below right=of 5]  (12) {12};
+                \node[block,below=of 12]        (X) {exit};
+
+                \draw (E) -- (1);
+                \draw (1) -- (2);
+                \draw (2) -- (3);
+                \draw (3) -- (4);
+                \draw (4) -- (5);
+                \draw (5) -- (7);
+                \draw (7) -- (8);
+                \draw (8) -- (10);
+                \draw (5) -- (12);
+                \draw (12) -- (X);
+
+                \draw[retreating, name path=10--3] (10) |- (3);
+                \path[name path=8--3] (8) |- (3);
+                \path[name intersections={of=10--3 and 8--3, by=inter}];
+                \draw[retreating,-] (8) -- (inter);
+
+                \draw[forward] (3) |- (12);
+              \end{tikzpicture}
+            \end{center}
+          Dept-first presentation.
+        \end{minipage}
+      \end{center}
+
+    \end{enumerate}
+
+  \newpage
+  \item The CFGs are below. A join node, J, has been added for
+    clarity.
+
+    \begin{minipage}[t]{\linewidth}
+      \begin{minipage}[t]{.45\linewidth}
+        \centering
+        \begin{minipage}[t]{\linewidth}
+          \begin{center}
+            \begin{tikzpicture}
+              \node[terminal]                  (E) {entry, 1--4};
+              \node[block,below right=of E]    (8) {8};
+              \node[block,below  left=of E]    (5) {5, 6};
+              \node[block,below  left=of 8]   (12) {12, 13};
+              \node[block,below right=of 8]    (9) {9, 10};
+              \node[block,below right=of 12]  (15) {15};
+              \node[block,below  left=of 15]  (23) {23};
+              \node[terminal,below left=of 23] (X) {exit};
+              \node[block,below right=of 15]  (16) {16, 17};
+              \node[block,below  left=of 16]  (20) {20};
+              \node[block,below right=of 16]  (18) {18};
+              \node (tmp)  at ($(20)!.5!(18)$) {};
+              \node[block,below =of tmp]   (J) {J};
+
+              \path (E) edge node[swap] {T} (5)
+                        edge node {F} (8);
+              \path (8) edge node[swap] {F} (12)
+                        edge node {T} (9);
+              \path (9) edge (15);
+              \path (12) edge (15);
+              \path (15) edge node[swap] {F} (23)
+                         edge node {T} (16);
+              \path (23) edge (X);
+              \path (16) edge node[swap] {F} (20)
+                         edge node {T} (18);
+              \path (18) edge (J);
+              \path (20) edge (J);
+
+              \draw (5) |- (X);
+
+              \node[node distance=.3cm,right=of 18,coordinate] (a) {};
+              \draw (J) -| (a) |- (15);
+            \end{tikzpicture}
+          \end{center}
+          CFG using maximal basic blocks.
+        \end{minipage}
+      \end{minipage}
+      %
+      \begin{minipage}[t]{.5\linewidth}
+        \centering
+        \begin{minipage}[t]{.6\linewidth}
+          \begin{center}
+            \begin{tikzpicture}
+              \node[terminal] (E)                   {entry};
+              \node[block,below=of E]          (1)  {1};
+              \node[block,below=of 1]          (2)  {2};
+              \node[block,below=of 2]          (3)  {3};
+              \node[block,below=of 3]          (4)  {4};
+              \node[block,below right=of 4]    (8)  {8};
+              \node[block,below  left=of 4]    (5)  {5};
+              \node[block,below  left=of 5]    (6)  {6};
+              \node[block,below  left=of 8]   (12) {12};
+              \node[block,below=of 12]        (13) {13};
+              \node[block,below right=of 8]    (9)  {9};
+              \node[block,below=of 9]         (10) {10};
+              \node[block,below right=of 13]  (15) {15};
+              \node[block,below  left=of 15]  (23) {23};
+              \node[terminal,below=of 23]      (X) {exit};
+              \node[block,below right=of 15]  (16) {16};
+              \node[block,below=of 16]        (17) {17};
+              \node[block,below  left=of 17]  (20) {20};
+              \node[block,below right=of 17]  (18) {18};
+              \node[block,below right=of 20]   (J)  {J};
+
+              \path (E) edge (1);
+              \path (1) edge (2);
+              \path (2) edge (3);
+              \path (3) edge (4);
+              \path (4) edge node[swap] {T} (5)
+                        edge node {F} (8);
+              \path (5) edge (6);
+              \path (8) edge node[swap] {F} (12)
+                        edge node {T} (9);
+              \path (9) edge (10);
+              \path (10) edge (15);
+              \path (12) edge (13);
+              \path (13) edge (15);
+              \path (15) edge node[swap] {F} (23)
+                         edge node {T} (16);
+              \path (23) edge (X);
+              \path (16) edge (17);
+              \path (17) edge node[swap] {F} (20)
+                         edge node {T} (18);
+              \path (18) edge (J);
+              \path (20) edge (J);
+
+              \draw (6) |- (X);
+
+              \node[node distance=.3cm,right=of 18,coordinate] (a) {};
+              \draw (J) -| (a) |- (15);
+            \end{tikzpicture}
+          \end{center}
+          CFG using one statement per block.
+        \end{minipage}
+      \end{minipage}
+    \end{minipage}
+\end{enumerate}
+
+\end{document}

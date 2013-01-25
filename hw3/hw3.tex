@@ -1,0 +1,669 @@
+% vim: nowrap:guioptions+=b
+
+\documentclass{article}
+
+\usepackage[osf]{mathpazo}
+\usepackage{microtype}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{mathtools}
+\usepackage{bm}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage[pdftex]{lscape}
+\usepackage{lipsum}
+\usepackage{tikz}
+\usepackage{enumitem}
+\usepackage[alsoload=binary]{siunitx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{fancyvrb}
+\usepackage[section]{placeins}
+\usepackage{flafter}
+\usepackage{pdfpages}
+\usepackage[hmargin=1.5in,vmargin=1in]{geometry}
+\usepackage{url}
+\usepackage{hyperref}
+
+% algorithms
+\let\oldgets\gets
+\usepackage{clrscode3e}
+\let\gets\oldgets
+
+% no section numbers
+\setcounter{secnumdepth}{-2}
+
+% a bit more compact, and fixes spacing issues
+\let\originalleft\left
+\let\originalright\right
+\renewcommand{\l}{\mathopen{}\mathclose\bgroup\originalleft}
+\renewcommand{\r}{\aftergroup\egroup\originalright}
+
+% commands
+\renewcommand\vec[1]{\bm{#1}}
+\renewcommand\epsilon{\varepsilon}
+\newcommand\bit{\ensuremath{\set{0,1}}}
+\newcommand\abs[1]{\l\vert #1 \r\vert}
+\newcommand\set[1]{\ensuremath{\l\{#1\r\}}}
+
+% red todos
+\usepackage{marginnote}
+\renewcommand\marginfont{\color{red}}
+\newcommand\todo[1]{{\color{red}*}\marginnote{* #1}}
+
+% write in code
+\DefineShortVerb{\|}
+
+\usetikzlibrary
+{
+  positioning,
+  calc,
+  intersections,
+  arrows,
+  shapes.misc,
+  shapes.geometric,
+}
+
+% redefine `\to` to use tikz arrows
+\renewcommand\to{%
+  \mathbin{\tikz[baseline=-.7ex] \draw[->] (0,0) -- +(.4,0);}%
+}
+
+\tikzset
+  {
+    ->,
+    >=latex',
+    shorten >=.5pt,
+    node distance=.5cm and .7cm,
+    auto,
+    fork/.style= {node distance=.5cm and #1},
+    wide fork/.style={fork=1.2cm},
+    block/.style=
+      {
+        draw,
+        inner sep=.3em,
+        rounded rectangle,
+        minimum size=1.7em,
+      },
+    terminal/.style=
+      {
+        block,
+        rectangle,
+        text height=1.5ex,
+        text depth=.25ex,
+      },
+    inline center/.style={baseline=-.5ex},
+    retreating/.style={dashed},
+    cross/.style={dashdotted},
+    forward/.style={dotted},
+  }
+
+% table customizaton
+\newcommand\newrow{\\\addlinespace}
+
+% center columns
+\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
+
+% set
+\newcommand\s[1]{\{#1\}}
+
+% highlight
+\newcommand\hi[1]{\textcolor{red}{#1}}
+
+\sisetup{math-rm=\rmfamily}
+
+\begin{document}
+\thispagestyle{empty}
+
+\includepdf
+  [
+    pages=1,
+    pagecommand=
+      {
+        \begin{tikzpicture}[remember picture, overlay]
+          \node[text width=6.3in, text height=2.6in]
+          at (current page.north east)
+          {\large
+            Sam Britt, Shriram Swaminathan,\\[1.5em]
+            and Sivaramachanran Ganesan
+          };
+        \end{tikzpicture}
+      }
+  ]
+  {Assignment3ProblemSet2}
+
+\clearpage
+\pagenumbering{arabic}
+
+\noindent
+Sam Britt               \hfill CS 6340      \\
+Shriram Swaminathan     \hfill Assignment 3 \\
+Sivaramachanran Ganesan \hfill Jan. 26, 2013
+
+\begin{enumerate}
+  \item
+    \begin{enumerate}
+      \item Reaching definitions are shown in Table~\ref{reaching-defs}.
+        Although the data is
+        presented in order of increasing block number, the table was
+        actually created in the following depth-first order:
+        1, 2, 3, 4, 8, 12, 13, 9, 10, 15, 23, 16, 17, 20, 18, 5, 6.
+
+      \item Reachable uses are shown in Table~\ref{reachable-uses}.
+        Although the data is presented in order of increasing block
+        number, the table was actually created in the following
+        reversed depth-first order:
+        6, 5, 18, 20, 17, 16, 23, 15, 10, 9, 13, 12, 8, 4, 3, 2, 1.
+
+      \item Definition-use pairs are shown in
+        Table~\ref{def-use-pairs}, grouped according to use.
+    \end{enumerate}
+
+  \item
+    \begin{enumerate}
+      \item First, we create the augmented CFG and the postdominator
+        tree:
+
+        \begin{minipage}[t]{\linewidth}
+          \begin{minipage}[t]{.5\linewidth}
+            \centering
+            \begin{minipage}[t]{.9\linewidth}
+              \begin{center}
+                \begin{tikzpicture}
+                  \node[terminal]               (E) {entry};
+                  \node[block,below=of E]       (1)  {1};
+                  \node[block,below=of 1]       (2)  {2};
+                  \node[block,below=of 2]       (3)  {3};
+                  \node[block,below left=of 3]  (4)  {4};
+                  \node[block,below=of 4]       (5)  {5};
+                  \node[block,fork=.8cm,below left=of 5]  (7)  {7};
+                  \node[block,fork=.8cm,below right=of 5] (6)  {6};
+                  \node[block,below=of 6]      (12) {12};
+                  \node[block,below=of 7]       (8)  {8};
+                  \node[block,below left=of 8] (10) {10};
+                  \node[block,below right=of 8] (9)  {9};
+                  \node[block,below right=of 10](J)  {J};
+                  \node[terminal,below=of 12]   (X) {exit};
+
+                  \path (E) -- node (mid) {} (X);
+                  \node[terminal,node distance=1cm,right=of mid] (S) {start};
+
+                  \path (E) edge (1);
+                  \path (1) edge (2);
+                  \path (2) edge (3);
+                  \path (3) edge node[swap] {T} (4)
+                            edge[bend left] node {F} (12);
+                  \path (12) edge (X);
+                  \path (4) edge (5);
+                  \path (5) edge node[swap] {F} (7)
+                            edge node {T} (6);
+                  \path (6) edge (12);
+                  \path (7) edge (8);
+                  \path (8) edge node[swap] {F} (10)
+                            edge node {T} (9);
+                  \path (10) edge (J);
+                  \path (9) edge (J);
+
+                  \node[node distance=.3cm,left=of 10,coordinate] (a) {};
+                  \draw (J) -| (a) |- (3);
+
+                  \draw (S) |- node[right,near start] {T} (E);
+                  \draw (S) |- node[right,near start] {F} (X);
+                \end{tikzpicture}
+              \end{center}
+              Augmented CFG.
+            \end{minipage}
+          \end{minipage}
+          %
+          \begin{minipage}[t]{.5\linewidth}
+            \centering
+            \begin{minipage}[t]{.9\linewidth}
+              \begin{center}
+                \begin{tikzpicture}
+                  \node[terminal]                             (X)  {exit};
+                  \node[terminal,below right=of X]            (S)  {start};
+                  \node[block,below=of X]                    (12)  {12};
+                  \node[block,wide fork,below left=of 12]     (3)  {3};
+                  \node[block,wide fork,below right=of 12]    (5)  {5};
+                  \node[block,below=of 12]                    (6)  {6};
+                  \node[block,below=of 5]                     (4)  {4};
+                  \node[block,fork=.4cm,below left=of 3]      (8)  {8};
+                  \node[block,fork=.4cm,below right=of 3]     (9)  {9};
+                  \node[block,node distance=.4cm,left=of 8]   (2)  {2};
+                  \node[block,node distance=.4cm,right=of 9] (10) {10};
+                  \node[block,below=of 2]                     (1)  {1};
+                  \node[terminal,below=of 1]                  (E)  {entry};
+                  \node[block,below=of 8]                     (7)  {7};
+
+                  \path (X) edge (12);
+                  \path (X) edge (S);
+                  \path (12) edge (3) edge (5) edge (6);
+                  \path (5) edge (4);
+                  \path (3) edge (2) edge (8) edge (9) edge (10);
+                  \path (2) edge (1);
+                  \path (1) edge (E);
+                  \path (8) edge (7);
+
+                \end{tikzpicture}
+              \end{center}
+              Corresponding postdominator tree.
+            \end{minipage}
+          \end{minipage}
+        \end{minipage}
+
+        We then find the set $S$, where each element in $S$ is an edge
+        $(A, B) \in G$, where $G$ is the above CFG and $B$ does not
+        postdominate $A$. We find that
+        \begin{equation*}
+          S = \text{\s{(start, entry), (3, 4), (5, 6), (5, 7), (8, 9),
+          (8, 10)}}.
+        \end{equation*}
+        For each edge $(A,B) \in S$, we find $L$ to be the common
+        ancestor of $A$ and $B$. Finally, the nodes that are
+        control-dependent on $A$ are those the path from $L$ to $B$ on
+        the postdominator tree, including $B$, and including $L$ only
+        if $L=A$. These results are summarized in the following table:
+        \begin{center}
+          \begin{tabular}{cccl}
+            \toprule
+            $(A,B) \in S$ & Condition (T/F) & $L$ & Nodes dependent on
+            $A$ \\
+            \midrule
+            (start, entry) & T & exit & \s{entry, 1, 2, 3, 12} \\
+            (3, 4)         & T & 12   & \s{4, 5} \\
+            (5, 6)         & T & 12   & \s{6} \\
+            (5, 7)         & F & 12   & \s{3, 7, 8} \\
+            (8, 9)         & T & 3    & \s{9} \\
+            (8, 10)        & F & 3    & \s{10} \\
+            \bottomrule
+          \end{tabular}
+        \end{center}
+        The control dependence graph is constructed directly from the
+        above table.
+
+        \begin{minipage}{\linewidth}
+          \centering
+          \begin{minipage}{.6\linewidth}
+            \begin{center}
+              \begin{tikzpicture}
+                [
+                  node distance=.8cm and 1cm,
+                ]
+                \node[terminal] (S) {start};
+                \node[block, below=of S] (2) {2};
+                \node[block, left=of 2]  (1) {1};
+                \node[terminal, left=of 1]  (E) {entry};
+                \node[block, right=of 2]  (3) {3};
+                \node[block, right=of 3]  (12) {12};
+
+                \node[block, below left=of 3] (4) {4};
+                \node[block, below right=of 3] (5) {5};
+
+                \node[block, below=of 5] (8) {8};
+                \node[block, below left=of 5] (6) {6};
+                \node[block, below right=of 5] (7) {7};
+
+                \node[block, below left=of 8] (9) {9};
+                \node[block, below right=of 8] (10) {10};
+
+                \path[auto=false]
+                  (S) edge node[above left=-3pt] {T} (E)
+                      edge node[near end, above left=-4pt] {T} (1)
+                      edge node[ left=0pt] {T} (2)
+                      edge node[near end, above right=-4pt] {T} (3)
+                      edge node[above right=-3pt] {T} (12);
+                \path (3) edge node[swap] {T} (4)
+                          edge[bend left] node {T} (5);
+                \path (5) edge  node[swap] {T} (6)
+                          edge[bend left] node {F} (3)
+                          edge node {F} (8)
+                          edge node {F} (7);
+                \path (8) edge node[swap] {T} (9)
+                          edge node {F} (10);
+              \end{tikzpicture}
+            \end{center}
+            Control dependence graph, without regions.
+          \end{minipage}
+        \end{minipage}
+
+        \newpage
+      \item Below, regions (indicated as trapezoids) are added to the control
+        dependence graph. This was performed in one pass through
+        the control dependence graph: for each node $n$ in the graph,
+        one region was created to group the nodes dependent on $n$
+        evaluating to |true|, if any, and another region to group the
+        nodes dependent on $n$ evaluating to |false|, if any. Each
+        region was made the parent of its corresponding node group,
+        and the region in turn was made a child of $n$.
+
+        \begin{minipage}{\linewidth}
+          \centering
+          \begin{minipage}{.7\linewidth}
+            \begin{center}
+              \begin{tikzpicture}
+                [
+                  node distance=.7 and .6,
+                  region/.style={trapezium, draw}
+                ]
+                \node[terminal] (S) {start};
+
+                \node[region, below=of S] (R1) {$R_1$};
+                \node[block, below=of R1] (2) {2};
+                \node[block, left=of 2]  (1) {1};
+                \node[terminal, left=of 1]  (E) {entry};
+                \node[block, right=of 2]  (3) {3};
+                \node[block, right=of 3]  (12) {12};
+
+                \node[region, below=of 3] (R2) {$R_2$};
+                \node[block, below left=of R2] (4) {4};
+                \node[block, below right=of R2] (5) {5};
+
+                \node[region, below left=of 5] (R3) {$R_3$};
+                \node[region, below right=of 5] (R4) {$R_4$};
+                \node[block, below=of R3] (6) {6};
+                \node[block, below left=of R4] (7) {7};
+                \node[block, below right=of R4] (8) {8};
+
+                \node[region, below left=of 8] (R5) {$R_5$};
+                \node[region, below right=of 8] (R6) {$R_6$};
+                \node[block, below=of R5] (9) {9};
+                \node[block, below=of R6] (10) {10};
+
+                \path (S) edge node[swap] {T} (R1);
+                \path (R1)
+                      edge (E)
+                      edge (1)
+                      edge (2)
+                      edge (3)
+                      edge (12);
+
+                \path (3) edge node[swap] {T} (R2);
+                \path (R2) edge (4) edge (5);
+
+                \path (5) edge node[swap] {T} (R3);
+                \path (5) edge node       {F} (R4);
+                \path (R3) edge (6);
+                \path (R4) edge[bend right] (3) edge (7) edge (8);
+
+
+                \path (8) edge node[swap] {T} (R5);
+                \path (8) edge node       {F} (R6);
+                \path (R5) edge (9);
+                \path (R6) edge (10);
+              \end{tikzpicture}
+            \end{center}
+            Control dependence graph, with regions added.
+          \end{minipage}
+        \end{minipage}
+
+    \end{enumerate}
+
+  \item
+    \newcommand\bottom{\ensuremath{\perp}}
+    \newcommand\union{\bigcup}
+    \newcommand\Kill{\texttt{KILL}}
+    \newcommand\Gen{\texttt{GEN}}
+    \begin{enumerate}
+      \item Our algorithm assumes that each block contains a single
+        statement, so that we can be sure each block contains a single
+        definition. Let $S$ be an array that contains, for each block
+        (statement) in the old program, the tuple $(\ell, d_\ell,
+        k_\ell)$, where
+        \begin{itemize}
+          \item[$\ell$] is the statement number (and block number),
+          \item[$d_\ell$]is the variable that statement $\ell$ defines
+            (possibly none, represented by the special symbol
+            \bottom), and
+          \item[$k_\ell$] is the \Kill\ set for the block at statement
+            $\ell$ (possibly empty).
+        \end{itemize}
+        For our algorithm to work, we need to store the latest value
+        of $S$ between iterations of the program.
+      \item We assume data about the changes to the program are given
+        as a list $C$ containing $(\ell, d'_\ell)$ tuples, where
+        $\ell$ is the line number that changed, and $d'_\ell$ is the
+        variable that $\ell$ defines in the new program. The value of
+        $d'_\ell$ can be \bottom\ if there is no definition at $\ell$,
+        and it can also be the same as $d_\ell$, the variable defined
+        by $\ell$ in the old program, if the line was altered but
+        still defines the same variable. The following algorithm will
+        update the relevant \Kill\ sets in $S$.
+
+        \begin{codebox}
+          \Procname{
+            \proc{Update-Kill}
+            $(
+              S=[(\ell_i, d_{\ell_i}, k_{\ell_i}), \dots],
+              C=[(\ell_j, d'_{\ell_j}), \dots]
+            )$
+          }
+          \li \For each $(\ell_i, d'_{\ell_i})$ in $C$
+          \li   \Do
+                  Find $(\ell_i, d_{\ell_i} k_{\ell_i})$ in $S$
+          \li     \If $d_{\ell_i} \ne d'_{\ell_i}$                                         \label{li:check-def}
+          \li       \Then
+                      \For each $(\ell_j, d_{\ell_j}, k_{\ell_j})$ in $S$
+          \li           \Do
+                          \If $d_{\ell_j} = d'_{\ell_i} \ne \bottom$, $\ell_j \ne \ell_i$  \label{li:add-kill-start}
+          \li               \Then
+                              Let $k_{\ell_j} \gets k_{\ell_j} \union \ell_i$
+          \li                 Let $k_{\ell_i} \gets k_{\ell_i} \union \ell_j$              \label{li:add-kill-end}
+                          \End
+          \li             \If $\ell_i \in k_{\ell_j}$                                      \label{li:rm-kill-start}
+          \li               \Then
+                              Let $k_{\ell_j} \gets k_{\ell_j} - \ell_i$
+          \li                 Let $k_{\ell_i} \gets k_{\ell_i} - \ell_j$                   \label{li:rm-kill-end}
+                          \End
+                      \End
+          \li         Let $d_{\ell_i} \gets d'_{\ell_i}$                                   \label{li:update-def}
+                  \End
+              \End
+        \end{codebox}
+
+        This procedure iterates through every line of change $\ell_i$
+        in $C$.  In line~\ref{li:check-def}, it first checks to see if
+        the definition at the line has really been changed, as these
+        changes are the only ones that will affect reaching
+        definitions. It then iterates through $S$. If a different
+        block defines the same variable as $\ell_i$
+        (and they actually give a definition; that is, neither are
+        \bottom), then both \Kill\ sets need to be updated to include
+        each other
+        (lines~\ref{li:add-kill-start}--\ref{li:add-kill-end}).
+        Alternatively, if a block is found with $\ell_i$ in its \Kill\
+        set, the both blocks need to be removed from each other's
+        \Kill\ set
+        (lines~\ref{li:rm-kill-start}--\ref{li:rm-kill-end})---we know
+        that the definitions are different from the check in
+        line~\ref{li:check-def}, and statements that define different
+        variables can't kill each other. Finally, the definition in
+        $S$ is updated to the new definition from $C$
+        (line~\ref{li:update-def}).
+
+        After running this procedure, $S$ will contain the \Kill\ sets
+        for each block, and the \Gen\ set for block $\ell$ will just
+        be $\s{\ell}$ if $d_{\ell} \ne \bottom$, else $\emptyset$.
+        So, since we have the \Gen\ and \Kill\ sets for every block in
+        the new program, we can compute the reaching definitions for
+        the new version of the program using the usual algorithm.
+
+      \item \todo{work through the algo. by hand for the test case}
+
+    \end{enumerate}
+\end{enumerate}
+
+\newlength\fatcolumn
+
+\begin{table}[htbp]
+  \caption
+  {
+    Reaching definitions, problem 1(a). Definitions are denoted
+    by their block number (source code line number); definitions made
+    in the entry block (that is, program in put parameters) are
+    denoted by $E$. We define $D$ to be the set of all definitions.
+    The notation \s{$i$--$k$} means \s{$i, i+1, \dots, k$}. Changes
+    from iteration 1 to iteration 2 are highlighted in red.
+  }
+  \label{reaching-defs}
+  \makebox[\textwidth]{% centers large table on page
+  \small
+  \setlength\fatcolumn{16.5ex}
+  %               Block  Gen    Kill     I:In   Out    1:In          Out           2:In          Out
+  \begin{tabular}{M{5ex} M{4ex} M{7.5ex} M{4ex} M{5ex} M{\fatcolumn} M{\fatcolumn} M{\fatcolumn} M{\fatcolumn}}
+    \toprule
+    \multirow{2}{*}{Block}
+    & \multirow{2}{*}{Gen}
+    & \multirow{2}{*}{Kill}
+    & \multicolumn{2}{c}{Init}
+    & \multicolumn{2}{c}{Iteration 1}
+    & \multicolumn{2}{c}{Iteration 2}
+    \\
+    \cmidrule(lr){4-5}
+    \cmidrule(lr){6-7}
+    \cmidrule(lr){8-9}
+    & &
+    & In & Out
+    & In & Out
+    & In & Out
+    \\
+    \midrule
+    entry  & \s{$E$}     & $\emptyset$ & $\emptyset$ & \s{$E$}     & $\emptyset$                                      & \s{$E$}                                          & $\emptyset$                                           & \s{$E$}                                               \newrow
+    1      & \s{1}       & \s{16}      & $\emptyset$ & \s{1}       & \s{$E$}                                          & \s{$E$, 1}                                       & \s{$E$}                                               & \s{$E$, 1}                                            \newrow
+    2      & \s{2}       & $\emptyset$ & $\emptyset$ & \s{2}       & \s{$E$, 1}                                       & \s{$E$, 1, 2}                                    & \s{$E$, 1}                                            & \s{$E$, 1, 2}                                         \newrow
+    3      & \s{3}       & $\emptyset$ & $\emptyset$ & \s{3}       & \s{$E$, 1, 2}                                    & \s{$E$, 1--3}                                    & \s{$E$, 1, 2}                                         & \s{$E$, 1--3}                                         \newrow
+    4      & $\emptyset$ & $\emptyset$ & $\emptyset$ & $\emptyset$ & \s{$E$, 1--3}                                    & \s{$E$, 1--3}                                    & \s{$E$, 1--3}                                         & \s{$E$, 1--3}                                         \newrow
+    5      & $\emptyset$ & $\emptyset$ & $\emptyset$ & $\emptyset$ & \s{$E$, 1--3}                                    & \s{$E$, 1--3}                                    & \s{$E$, 1--3}                                         & \s{$E$, 1--3}                                         \newrow
+    6      & $\emptyset$ & $\emptyset$ & $\emptyset$ & $\emptyset$ & \s{$E$, 1--3}                                    & \s{$E$, 1--3}                                    & \s{$E$, 1--3}                                         & \s{$E$, 1--3}                                         \newrow
+    8      & $\emptyset$ & $\emptyset$ & $\emptyset$ & $\emptyset$ & \s{$E$, 1--3}                                    & \s{$E$, 1--3}                                    & \s{$E$, 1--3}                                         & \s{$E$, 1--3}                                         \newrow
+    9      & \s{9}       & \s{12, 20}  & $\emptyset$ & \s{9}       & \s{$E$, 1--3}                                    & \s{$E$, 1--3, 9}                                 & \s{$E$, 1--3}                                         & \s{$E$, 1--3, 9}                                      \newrow
+    10     & \s{10}      & \s{13, 18}  & $\emptyset$ & \s{10}      & \s{$E$, 1--3, 9}                                 & \s{$E$, 1--3, 9, 10}                             & \s{$E$, 1--3, 9}                                      & \s{$E$, 1--3, 9, 10}                                  \newrow
+    12     & \s{12}      & \s{9, 20}   & $\emptyset$ & \s{12}      & \s{$E$, 1--3}                                    & \s{$E$, 1--3, 12}                                & \s{$E$, 1--3}                                         & \s{$E$, 1--3, 12}                                     \newrow
+    13     & \s{13}      & \s{10, 18}  & $\emptyset$ & \s{13}      & \s{$E$, 1--3, 12}                                & \s{$E$, 1--3, 12, 13}                            & \s{$E$, 1--3, 12}                                     & \s{$E$, 1--3, 12, 13}                                 \newrow
+    15     & $\emptyset$ & $\emptyset$ & $\emptyset$ & $\emptyset$ & \s{$E$, 1--3, 9, 10,\newline 12, 13, 18, 20}     & \s{$E$, 1--3, 9, 10,\newline 12, 13, 18, 20}     & \s{$E$, 1--3, 9, 10,\newline 12, 13, \hi{16}, 18, 20} & \s{$E$, 1--3, 9, 10,\newline 12, 13, \hi{16}, 18, 20} \newrow
+    16     & \s{16}      & \s{1}       & $\emptyset$ & \s{16}      & \s{$E$, 1--3, 9, 10,\newline 12, 13, 18, 20}     & \s{$E$, 2, 3, 9, 10,\newline 12, 13, 16, 18, 20} & \s{$E$, 1--3, 9, 10,\newline 12, 13, \hi{16}, 18, 20} & \s{$E$, 2, 3, 9, 10,\newline 12, 13, 16, 18, 20}      \newrow
+    17     & $\emptyset$ & $\emptyset$ & $\emptyset$ & $\emptyset$ & \s{$E$, 2, 3, 9, 10,\newline 12, 13, 16, 18, 20} & \s{$E$, 2, 3, 9, 10,\newline 12, 13, 16, 18, 20} & \s{$E$, 2, 3, 9, 10,\newline 12, 13, 16, 18, 20}      & \s{$E$, 2, 3, 9, 10,\newline 12, 13, 16, 18, 20}      \newrow
+    18     & \s{18}      & \s{10, 13}  & $\emptyset$ & \s{18}      & \s{$E$, 2, 3, 9, 10,\newline 12, 13, 16, 18, 20} & \s{$E$, 2, 3, 9,\newline 12, 16, 18, 20}         & \s{$E$, 2, 3, 9, 10,\newline 12, 13, 16, 18, 20}      & \s{$E$, 2, 3, 9,\newline 12, 16, 18, 20}              \newrow
+    20     & \s{20}      & \s{9, 12}   & $\emptyset$ & \s{20}      & \s{$E$, 2, 3, 9, 10,\newline 12, 13, 16, 18, 20} & \s{$E$, 2, 3, 10,\newline 13, 16, 18, 20}        & \s{$E$, 2, 3, 9, 10,\newline 12, 13, 16, 18, 20}      & \s{$E$, 2, 3, 10,\newline 13, 16, 18, 20}             \newrow
+    23     & $\emptyset$ & $\emptyset$ & $\emptyset$ & $\emptyset$ & \s{$E$, 1--3, 9, 10,\newline 12, 13, 18, 20}     & \s{$E$, 1--3, 9, 10,\newline 12, 13, 18, 20}     & \s{$E$, 1--3, 9, 10,\newline 12, 13, \hi{16}, 18, 20} & \s{$E$, 1--3, 9, 10,\newline 12, 13, \hi{16}, 18, 20} \newrow
+    exit   & $\emptyset$ & $D$         & $\emptyset$ & $\emptyset$ & \s{$E$, 1--3, 9, 10,\newline 12, 13, 18, 20}     & $\emptyset$                                      & \s{$E$, 1--3, 9, 10,\newline 12, 13, \hi{16}, 18, 20} & $\emptyset$                                           \newrow
+    \bottomrule
+  \end{tabular}
+  } % end makebox
+\end{table}
+
+\newgeometry{vmargin=1in,hmargin=.5in}
+\begin{landscape}
+  \begin{table}[htbp]
+      \centering
+      \begin{minipage}{\textwidth}
+      \caption
+      {
+        Reachable uses, problem 1(b). If a source code line contains
+        only one use, the use is denoted by the line number.
+        Otherwise, the notation $\ell.i$ means the $i$th use in line
+        $\ell$, and \s{$\ell.i$--$k$} means \s{$\ell.i, \ell.(i+1),
+        \dots \ell.k$}. Changes from iteration 1 to iteration 2 are
+        highlighted in red.
+      }
+      \label{reachable-uses}
+      \makebox[\textwidth]{% centers large table on page
+      \small
+      \setlength\fatcolumn{19ex}
+      %               Block  Gen    Kill          I:In   Out           1:In          Out           2:In          Out
+      \begin{tabular}{M{5ex} M{9ex} M{\fatcolumn} M{4ex} M{\fatcolumn} M{\fatcolumn} M{\fatcolumn} M{\fatcolumn} M{\fatcolumn}}
+        \toprule
+        \multirow{2}{*}{Block}
+        & \multirow{2}{*}{Gen}
+        & \multirow{2}{*}{Kill}
+        & \multicolumn{2}{c}{Init}
+        & \multicolumn{2}{c}{Iteration 1}
+        & \multicolumn{2}{c}{Iteration 2}
+        \\
+        \cmidrule(lr){4-5}
+        \cmidrule(lr){6-7}
+        \cmidrule(lr){8-9}
+        & &
+        & In & Out
+        & In & Out
+        & In & Out
+        \\
+        \midrule
+        entry & $\emptyset$ & \s{4, 8, 9, 13,\newline 17.3, 17.6} & $\emptyset$ & \s{4, 8, 9, 13,\newline 17.3, 17.6} & \s{4, 8, 9, 13,\newline 17.3, 17.6}                  & $\emptyset$                                          & \s{4, 8, 9, 13,\newline 17.3, 17.6}                               & $\emptyset$                                                          \newrow
+        1     & $\emptyset$ & \s{17.1--2,\newline 18, 20, 23}     & $\emptyset$ & $\emptyset$                         & \s{4, 8, 9, 13,\newline 17.3, 17.6, 23}              & \s{4, 8, 9, 13,\newline 17.3, 17.6}                  & \s{4, 8, 9, 13,\newline 17.3, 17.6, 23}                           & \s{4, 8, 9, 13,\newline 17.3, 17.6}                                  \newrow
+        2     & $\emptyset$ & \s{6}                               & $\emptyset$ & $\emptyset$                         & \s{4, 6, 8, 9, 13,\newline 17.3, 17.6, 23}           & \s{4, 8, 9, 13,\newline 17.3, 17.6, 23}              & \s{4, 6, 8, 9, 13,\newline 17.3, 17.6, 23}                        & \s{4, 8, 9, 13,\newline 17.3, 17.6, 23}                              \newrow
+        3     & $\emptyset$ & \s{12, 15.3}                        & $\emptyset$ & $\emptyset$                         & \s{4, 6, 8, 9, 12, 13,\newline 15.3, 17.3, 17.6, 23} & \s{4, 6, 8, 9, 13,\newline 17.3, 17.6, 23}           & \s{4, 6, 8, 9, 12, 13,\newline 15.3, 17.3, 17.6, 23}              & \s{4, 6, 8, 9, 13,\newline 17.3, 17.6, 23}                           \newrow
+        4     & \s{4}       & $\emptyset$                         & $\emptyset$ & \s{4}                               & \s{6, 8, 9, 12, 13,\newline 15.3, 17.3, 17.6, 23}    & \s{4, 6, 8, 9, 12, 13,\newline 15.3, 17.3, 17.6, 23} & \s{6, 8, 9, 12, 13,\newline 15.3, 17.3, 17.6, 23}                 & \s{4, 6, 8, 9, 12, 13,\newline 15.3, 17.3, 17.6, 23}                 \newrow
+        5     & $\emptyset$ & $\emptyset$                         & $\emptyset$ & $\emptyset$                         & \s{6}                                                & \s{6}                                                & \s{6}                                                             & \s{6}                                                                \newrow
+        6     & \s{6}       & $\emptyset$                         & $\emptyset$ & \s{6}                               & $\emptyset$                                          & \s{6}                                                & $\emptyset$                                                       & \s{6}                                                                \newrow
+        8     & \s{8}       & $\emptyset$                         & $\emptyset$ & \s{8}                               & \s{9, 12, 13, 15.3,\newline 17.3, 17.6, 23}          & \s{8, 9, 12, 13, 15.3,\newline 17.3, 17.6, 23}       & \s{9, 12, 13, 15.3,\newline 17.3, 17.6, 23}                       & \s{8, 9, 12, 13, 15.3,\newline 17.3, 17.6, 23}                       \newrow
+        9     & \s{9}       & \s{15.2, 16.1,\newline 17.4--5}     & $\emptyset$ & \s{9}                               & \s{15.2--3, 16,\newline 17.3--6, 23}                 & \s{9, 15.3, 17.3,\newline 17.6, 23}                  & \s{15.2--3, 16,\newline 17.3--6, 23}                              & \s{9, 15.3, 17.3,\newline 17.6, 23}                                  \newrow
+        10    & $\emptyset$ & \s{15.1, 16.2}                      & $\emptyset$ & $\emptyset$                         & \s{15.1--3, 16.1--2,\newline 17.3--6, 23}            & \s{15.2--3, 16.1,\newline 17.3--6, 23}               & \s{15.1--3, 16.1--2,\newline 17.3--6, 23}                         & \s{15.2--3, 16.1,\newline 17.3--6, 23}                               \newrow
+        12    & \s{12}      & \s{15.2, 16.1,\newline 17.4--5}     & $\emptyset$ & \s{12}                              & \s{13, 15.2--3,\newline 16, 17.3--6, 23}             & \s{12, 13, 15.3,\newline 17.3, 17.6, 23}             & \s{13, 15.2--3,\newline 16, 17.3--6, 23}                          & \s{12, 13, 15.3,\newline 17.3, 17.6, 23}                             \newrow
+        13    & \s{13}      & \s{15.1, 16.2}                      & $\emptyset$ & \s{13}                              & \s{15.1--3, 16.1--2,\newline 17.3--6, 23}            & \s{13, 15.2--3, 16.1,\newline 17.3--6, 23}           & \s{15.1--3, 16.1--2,\newline 17.3--6, 23}                         & \s{13, 15.2--3, 16.1,\newline 17.3--6, 23}                           \newrow
+        15    & \s{15.1--3} & $\emptyset$                         & $\emptyset$ & \s{15.1--3}                         & \s{15.1--3, 16.1--2,\newline 17.3--6, 23}            & \s{15.1--3, 16.1--2,\newline 17.3--6, 23}            & \s{15.1--3, 16.1--2,\newline 17.3--6, 23}                         & \s{15.1--3, 16.1--2,\newline 17.3--6, 23}                            \newrow
+        16    & \s{16.1--2} & \s{17.1--2,\newline 18, 20, 23}     & $\emptyset$ & \s{16}                              & \s{15.1--3, 17.1--6,\newline 18, 20}                 & \s{15.1--3, 16.1--2,\newline 17.3--6}                & \s{15.1--3, \hi{16.1--2},\newline 17.1--6, 18, 20, \hi{23}}       & \s{15.1--3, 16.1--2,\newline 17.3--6}                                \newrow
+        17    & \s{17.1--6} & $\emptyset$                         & $\emptyset$ & \s{17.1--6}                         & \s{15.1--3, 18, 20}                                  & \s{15.1--3,\newline 17.1--6, 18, 20}                 & \s{15.1--3, \hi{16.1--2},\newline \hi{17.3--6},  18, 20, \hi{23}} & \s{15.1--3, \hi{16.1--2},\newline 17.1--6, 18, 20, \hi{23}}          \newrow
+        18    & \s{18}      & \s{15.1, 16.2}                      & $\emptyset$ & \s{18}                              & \s{15.1--3}                                          & \s{15.1, 15.3, 18}                                   & \s{15.1--3, \hi{16.1--2},\newline \hi{17.3--6}, \hi{23}}          & \s{15.2--3, \hi{16.1},\newline \hi{17.3--6}, 18, \hi{23}}            \newrow
+        20    & \s{20}      & \s{15.2, 16.1,\newline 17.4--5}     & $\emptyset$ & \s{20}                              & \s{15.1--3}                                          & \s{15.1, 15.3, 20}                                   & \s{15.1--3, \hi{16.1--2},\newline \hi{17.3--6}, \hi{23}}          & \s{15.1, 15.3, \hi{16.2},\newline \hi{17.3}, \hi{17.6}, 20, \hi{23}} \newrow
+        23    & \s{23}      & $\emptyset$                         & $\emptyset$ & \s{23}                              & $\emptyset$                                          & \s{23}                                               & $\emptyset$                                                       & \s{23}                                                               \newrow
+        \bottomrule
+      \end{tabular}
+      } % end makebox
+      \end{minipage}
+  \end{table}
+\end{landscape}
+\restoregeometry
+
+\begin{table}[htbp]
+  \centering
+  \begin{minipage}[t]{.7\linewidth}
+    \centering
+  \caption
+  {
+    Definition-use pairs, problem 1(c). If a source code line contains
+    only one use, the use is denoted by the line number. Otherwise,
+    the notation $\ell.i$ means the $i$th use in line $\ell$.
+    Definitions in the entry block (that is, program parameters) are
+    denoted by $E$.
+  }
+  \label{def-use-pairs}
+  \small
+  \begin{tabular}{c>{\ttfamily}cc}
+    \toprule
+    {Use}
+    & \multicolumn{1}{c}{Variable}
+    & Definitions
+    \\
+    \midrule
+    4    & x      & \s{$E$}    \\
+    6    & errval & \s{2}          \\
+    8    & x      & \s{$E$}    \\
+    9    & x      & \s{$E$}    \\
+    12   & eps    & \s{3}          \\
+    13   & x      & \s{$E$}    \\
+    15.1 & x2     & \s{10, 13, 18} \\
+    15.2 & x1     & \s{9, 12, 20}  \\
+    15.3 & eps    & \s{3}          \\
+    16.1 & x1     & \s{9, 12, 20}  \\
+    16.2 & x2     & \s{10, 13, 18} \\
+    17.1 & x3     & \s{16}         \\
+    17.2 & x3     & \s{16}         \\
+    17.3 & x      & \s{$E$}    \\
+    17.4 & x1     & \s{9, 12, 20}  \\
+    17.5 & x1     & \s{9, 12, 20}  \\
+    17.6 & x      & \s{$E$}    \\
+    18   & x3     & \s{16}         \\
+    20   & x3     & \s{16}         \\
+    23   & x3     & \s{1, 16}      \\
+    \bottomrule
+  \end{tabular}
+  \end{minipage}
+\end{table}
+
+
+
+\end{document}

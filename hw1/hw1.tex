@@ -1,0 +1,31 @@
+\definefontfeature
+  [default]
+  [default]
+  [protrusion=quality,expansion=quality]
+\setupalign[hz,hanging]
+% \enablemode[txmath,pxmath,lmmath] % fixes some spacing issues
+% \setupbodyfont[times]
+\setupbodyfont[palatino]
+
+\setuppagenumbering[location=]
+
+\useexternalfigure[sam][sam-britt-1000px][width=2.5in]
+
+\starttext
+
+Sam Britt \\
+CS 6340 \\
+Assignment 1 \\
+
+\placefigure[right,nonumber]{This is me. My wife doesn't
+like this picture. Too bad.}{\externalfigure[sam]}
+My name is Sam Britt. I am an MS student in CS, specializing in
+systems. I have no real relevant work experience; I co-oped as an
+undergraduate in a materials research firm (my Bachelor's degree is in
+materials science and engineering). I hope to work in embedded
+software for devices. I am taking this course mostly to expand my
+knowledge base; that is, as a \quotation{breadth course for Software
+Engineering.} I'd like to be better (more formal, more
+thorough) in testing and validating my software.
+
+\stoptext

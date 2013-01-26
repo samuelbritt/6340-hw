@@ -503,7 +503,7 @@ Sivaramachanran Ganesan \hfill Jan. 26, 2013
   {
     Reaching definitions, problem 1(a). Definitions are denoted
     by their block number (source code line number); definitions made
-    in the entry block (that is, program in put parameters) are
+    in the entry block (that is, program input parameters) are
     denoted by $E$. We define $D$ to be the set of all definitions.
     The notation \s{$i$--$k$} means \s{$i, i+1, \dots, k$}. Changes
     from iteration 1 to iteration 2 are highlighted in red.
@@ -512,8 +512,8 @@ Sivaramachanran Ganesan \hfill Jan. 26, 2013
   \makebox[\textwidth]{% centers large table on page
   \small
   \setlength\fatcolumn{16.5ex}
-  %               Block  Gen    Kill     I:In   Out    1:In          Out           2:In          Out
-  \begin{tabular}{M{5ex} M{4ex} M{7.5ex} M{4ex} M{5ex} M{\fatcolumn} M{\fatcolumn} M{\fatcolumn} M{\fatcolumn}}
+  %               Block Gen Kill I:In Out 1:In          Out           2:In          Out
+  \begin{tabular}{c     c   c    c    c   M{\fatcolumn} M{\fatcolumn} M{\fatcolumn} M{\fatcolumn}}
     \toprule
     \multirow{2}{*}{Block}
     & \multirow{2}{*}{Gen}
@@ -558,8 +558,8 @@ Sivaramachanran Ganesan \hfill Jan. 26, 2013
 \newgeometry{vmargin=1in,hmargin=.5in}
 \begin{landscape}
   \begin{table}[htbp]
-      \centering
-      \begin{minipage}{\textwidth}
+    \centering
+    \begin{minipage}{\textwidth}
       \caption
       {
         Reachable uses, problem 1(b). If a source code line contains
@@ -573,8 +573,8 @@ Sivaramachanran Ganesan \hfill Jan. 26, 2013
       \makebox[\textwidth]{% centers large table on page
       \small
       \setlength\fatcolumn{19ex}
-      %               Block  Gen    Kill          I:In   Out           1:In          Out           2:In          Out
-      \begin{tabular}{M{5ex} M{9ex} M{\fatcolumn} M{4ex} M{\fatcolumn} M{\fatcolumn} M{\fatcolumn} M{\fatcolumn} M{\fatcolumn}}
+      %               Block Gen Kill          I:In Out           1:In          Out           2:In          Out
+      \begin{tabular}{c     c   M{\fatcolumn} c    M{\fatcolumn} M{\fatcolumn} M{\fatcolumn} M{\fatcolumn} M{\fatcolumn}}
         \toprule
         \multirow{2}{*}{Block}
         & \multirow{2}{*}{Gen}
@@ -613,7 +613,7 @@ Sivaramachanran Ganesan \hfill Jan. 26, 2013
         \bottomrule
       \end{tabular}
       } % end makebox
-      \end{minipage}
+    \end{minipage}
   \end{table}
 \end{landscape}
 \restoregeometry
@@ -634,17 +634,17 @@ Sivaramachanran Ganesan \hfill Jan. 26, 2013
   \small
   \begin{tabular}{c>{\ttfamily}cc}
     \toprule
-    {Use}
+    Use
     & \multicolumn{1}{c}{Variable}
     & Definitions
     \\
     \midrule
-    4    & x      & \s{$E$}    \\
+    4    & x      & \s{$E$}        \\
     6    & errval & \s{2}          \\
-    8    & x      & \s{$E$}    \\
-    9    & x      & \s{$E$}    \\
+    8    & x      & \s{$E$}        \\
+    9    & x      & \s{$E$}        \\
     12   & eps    & \s{3}          \\
-    13   & x      & \s{$E$}    \\
+    13   & x      & \s{$E$}        \\
     15.1 & x2     & \s{10, 13, 18} \\
     15.2 & x1     & \s{9, 12, 20}  \\
     15.3 & eps    & \s{3}          \\
@@ -652,10 +652,10 @@ Sivaramachanran Ganesan \hfill Jan. 26, 2013
     16.2 & x2     & \s{10, 13, 18} \\
     17.1 & x3     & \s{16}         \\
     17.2 & x3     & \s{16}         \\
-    17.3 & x      & \s{$E$}    \\
+    17.3 & x      & \s{$E$}        \\
     17.4 & x1     & \s{9, 12, 20}  \\
     17.5 & x1     & \s{9, 12, 20}  \\
-    17.6 & x      & \s{$E$}    \\
+    17.6 & x      & \s{$E$}        \\
     18   & x3     & \s{16}         \\
     20   & x3     & \s{16}         \\
     23   & x3     & \s{1, 16}      \\

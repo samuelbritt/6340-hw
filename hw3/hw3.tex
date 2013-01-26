@@ -1,8 +1,8 @@
-% vim: nowrap:guioptions+=b
-
 \documentclass{article}
 
+\usepackage[T1]{fontenc}
 \usepackage[osf]{mathpazo}
+% \usepackage{tgpagella}
 \usepackage{microtype}
 
 \usepackage{amsmath}
@@ -21,6 +21,7 @@
 \usepackage{booktabs}
 \usepackage{multirow}
 \usepackage{tabularx}
+\usepackage{cancel}
 \usepackage{fancyvrb}
 \usepackage[section]{placeins}
 \usepackage{flafter}
@@ -96,6 +97,11 @@
         text height=1.5ex,
         text depth=.25ex,
       },
+    region/.style=
+      {
+        draw,
+        trapezium,
+      },
     inline center/.style={baseline=-.5ex},
     retreating/.style={dashed},
     cross/.style={dashdotted},
@@ -114,7 +120,14 @@
 % highlight
 \newcommand\hi[1]{\textcolor{red}{#1}}
 
-\sisetup{math-rm=\rmfamily}
+
+% data analysis
+\newcommand\bottom{\ensuremath{\perp}}
+\newcommand\union{\bigcup}
+\newcommand\Kill{\texttt{KILL}}
+\newcommand\Gen{\texttt{GEN}}
+\newcommand\varfamily{\ttfamily}
+\newcommand\var[1]{\text{\varfamily #1}}
 
 \begin{document}
 \thispagestyle{empty}
@@ -129,7 +142,7 @@
           at (current page.north east)
           {\large
             Sam Britt, Shriram Swaminathan,\\[1.5em]
-            and Sivaramachanran Ganesan
+            and Sivaramachandran Ganesan
           };
         \end{tikzpicture}
       }
@@ -140,9 +153,9 @@
 \pagenumbering{arabic}
 
 \noindent
-Sam Britt               \hfill CS 6340      \\
-Shriram Swaminathan     \hfill Assignment 3 \\
-Sivaramachanran Ganesan \hfill Jan. 26, 2013
+Sam Britt                \hfill CS 6340      \\
+Shriram Swaminathan      \hfill Assignment 3 \\
+Sivaramachandran Ganesan \hfill Jan. 26, 2013
 
 \begin{enumerate}
   \item
@@ -331,14 +344,14 @@ Sivaramachanran Ganesan \hfill Jan. 26, 2013
         \end{minipage}
 
         \newpage
-      \item Below, regions (indicated as trapezoids) are added to the control
-        dependence graph. This was performed in one pass through
-        the control dependence graph: for each node $n$ in the graph,
-        one region was created to group the nodes dependent on $n$
-        evaluating to |true|, if any, and another region to group the
-        nodes dependent on $n$ evaluating to |false|, if any. Each
-        region was made the parent of its corresponding node group,
-        and the region in turn was made a child of $n$.
+      \item Below, regions (indicated as trapezoids) are added to the
+        control dependence graph. This was performed in one pass
+        through the control dependence graph: for each node $n$ in the
+        graph, one region was created to group the nodes dependent on
+        $n$ evaluating to |true|, if any, and another region to group
+        the nodes dependent on $n$ evaluating to |false|, if any. Each
+        region was made the parent of the nodes in its corresponding
+        group, and the region in turn was made a child of $n$.
 
         \begin{minipage}{\linewidth}
           \centering
@@ -347,7 +360,6 @@ Sivaramachanran Ganesan \hfill Jan. 26, 2013
               \begin{tikzpicture}
                 [
                   node distance=.7 and .6,
-                  region/.style={trapezium, draw}
                 ]
                 \node[terminal] (S) {start};
 
@@ -403,10 +415,6 @@ Sivaramachanran Ganesan \hfill Jan. 26, 2013
     \end{enumerate}
 
   \item
-    \newcommand\bottom{\ensuremath{\perp}}
-    \newcommand\union{\bigcup}
-    \newcommand\Kill{\texttt{KILL}}
-    \newcommand\Gen{\texttt{GEN}}
     \begin{enumerate}
       \item Our algorithm assumes that each block contains a single
         statement, so that we can be sure each block contains a single
@@ -490,7 +498,139 @@ Sivaramachanran Ganesan \hfill Jan. 26, 2013
         the new program, we can compute the reaching definitions for
         the new version of the program using the usual algorithm.
 
-      \item \todo{work through the algo. by hand for the test case}
+      \item First, we create the array $S$ for the old program,
+        presented here it the form of a table:
+        \begin{center}
+          \begin{tabular}{c>{\varfamily}cc}
+            \toprule
+            Block & \multicolumn{1}{c}{Variable} & Kill \\
+            \midrule
+            1  & \bottom & $\emptyset$ \\
+            2  & x1      & \s{7, 9}    \\
+            3  & x2      & $\emptyset$ \\
+            4  & \bottom & $\emptyset$ \\
+            5  & x3      & $\emptyset$ \\
+            6  & \bottom & $\emptyset$ \\
+            7  & x1      & \s{2, 9}    \\
+            9  & x1      & \s{2, 7}    \\
+            12 & \bottom & $\emptyset$ \\
+            13 & \bottom & $\emptyset$ \\
+            14 & \bottom & $\emptyset$ \\
+            \bottomrule
+          \end{tabular}
+        \end{center}
+
+        The changeset $C$ from version 1 to version 2 the sample program is given as
+        \begin{equation*}
+          C = \l[
+            \l( 7, \var{x2} \r),
+            \l( 9, \var{x1} \r)
+          \r]
+        \end{equation*}
+
+        First we consider $(7, \var{x2})$. Here, $\ell = 7$, $d'_7 =
+        \var{x2}$, and $d_7 = \var{x1}$. Since $d_7 \ne d'_7$, control
+        gets past line~\ref{li:check-def}. Now we iterate through each
+        tuple $(\ell_j, d_{\ell_j}, k_{\ell_j})$ in $S$, looking for
+        $d_{\ell_j} = d'_7$ or $7 \in k_{\ell_j}$. We find that block
+        2 has 7 in its \Kill\ set, so we remove 7 from $k_2$ and
+        remove 2 from $k_7$. The resulting $S$ is shown below left.
+
+        Continuing through $S$, we find that $d_3 = d'_7 = \var{x2}$,
+        so we add 7 to $k_3$ and add 3 to $k_7$. The resulting $S$ is
+        shown below right (additions are highlighted in red).
+        \begin{minipage}{\linewidth}
+          \centering
+          \begin{minipage}{.45\textwidth}
+            \centering
+            \begin{tabular}{c>{\varfamily}cc}
+              \toprule
+              Block & \multicolumn{1}{c}{Variable} & Kill \\
+              \midrule
+              1  & \bottom & $\emptyset$ \\
+              2  & x1      & \s{\cancel{7}, 9}    \\
+              3  & x2      & $\emptyset$ \\
+              4  & \bottom & $\emptyset$ \\
+              5  & x3      & $\emptyset$ \\
+              6  & \bottom & $\emptyset$ \\
+              7  & x1      & \s{\cancel{2}, 9}    \\
+              9  & x1      & \s{2, 7}    \\
+              12 & \bottom & $\emptyset$ \\
+              13 & \bottom & $\emptyset$ \\
+              14 & \bottom & $\emptyset$ \\
+              \bottomrule
+            \end{tabular}
+          \end{minipage}
+          %
+          \begin{minipage}{.45\textwidth}
+            \centering
+            \begin{tabular}{c>{\varfamily}cc}
+              \toprule
+              Block & \multicolumn{1}{c}{Variable} & Kill \\
+              \midrule
+              1  & \bottom & $\emptyset$ \\
+              2  & x1      & \s{\cancel{7}, 9}    \\
+              3  & x2      & \s{\hi{7}} \\
+              4  & \bottom & $\emptyset$ \\
+              5  & x3      & $\emptyset$ \\
+              6  & \bottom & $\emptyset$ \\
+              7  & x1      & \s{\cancel{2}, 9, \hi{3}}    \\
+              9  & x1      & \s{2, 7}    \\
+              12 & \bottom & $\emptyset$ \\
+              13 & \bottom & $\emptyset$ \\
+              14 & \bottom & $\emptyset$ \\
+              \bottomrule
+            \end{tabular}
+          \end{minipage}
+        \end{minipage}
+
+        \vspace{1ex}
+        Continuing, we find 7 in $k_9$, so we remove 7 from $k_9$ and
+        9 from $k_7$. Finally, we let $d_7 \gets d'_7 = \var{x2}$.
+        The final value of $S$ for the change $(7, \var{x2})$ is
+        \begin{center}
+          \begin{tabular}{c>{\varfamily}cc}
+            \toprule
+            Block & \multicolumn{1}{c}{Variable} & Kill \\
+            \midrule
+            1  & \bottom                        & $\emptyset$ \\
+            2  & x1                             & \s{\cancel{7}, 9}    \\
+            3  & x2                             & \s{\hi{7}} \\
+            4  & \bottom                        & $\emptyset$ \\
+            5  & x3                             & $\emptyset$ \\
+            6  & \bottom                        & $\emptyset$ \\
+            7  & $\cancelto{\var{x2}}{\var{x1}}$ & \s{\cancel{2}, \cancel{9}, \hi{3}}    \\
+            9  & x1                             & \s{2, \cancel{7}}    \\
+            12 & \bottom                        & $\emptyset$ \\
+            13 & \bottom                        & $\emptyset$ \\
+            14 & \bottom                        & $\emptyset$ \\
+            \bottomrule
+          \end{tabular}
+        \end{center}
+
+        The second change is $(9, \var{x1})$. But here, $\ell = 9$ and
+        $d'_9 = d_9 = \var{x1}$. Therefore, the algorithm never gets
+        past line~\ref{li:check-def} and $S$ remains unchanged. The
+        final, stored version of $S$ is therefore
+         \begin{center}
+          \begin{tabular}{c>{\varfamily}cc}
+            \toprule
+            Block & \multicolumn{1}{c}{Variable} & Kill \\
+            \midrule
+            1  & \bottom  & $\emptyset$ \\
+            2  & x1       & \s{9}    \\
+            3  & x2       & \s{7} \\
+            4  & \bottom  & $\emptyset$ \\
+            5  & x3       & $\emptyset$ \\
+            6  & \bottom  & $\emptyset$ \\
+            7  & \var{x2} & \s{3}    \\
+            9  & x1       & \s{2}    \\
+            12 & \bottom  & $\emptyset$ \\
+            13 & \bottom  & $\emptyset$ \\
+            14 & \bottom  & $\emptyset$ \\
+            \bottomrule
+          \end{tabular}
+        \end{center}
 
     \end{enumerate}
 \end{enumerate}
@@ -565,7 +705,7 @@ Sivaramachanran Ganesan \hfill Jan. 26, 2013
         only one use, the use is denoted by the line number.
         Otherwise, the notation $\ell.i$ means the $i$th use in line
         $\ell$, and \s{$\ell.i$--$k$} means \s{$\ell.i, \ell.(i+1),
-        \dots \ell.k$}. Changes from iteration 1 to iteration 2 are
+        \dots, \ell.k$}. Changes from iteration 1 to iteration 2 are
         highlighted in red.
       }
       \label{reachable-uses}
@@ -631,7 +771,7 @@ Sivaramachanran Ganesan \hfill Jan. 26, 2013
   }
   \label{def-use-pairs}
   \small
-  \begin{tabular}{c>{\ttfamily}cc}
+  \begin{tabular}{c>{\varfamily}cc}
     \toprule
     Use
     & \multicolumn{1}{c}{Variable}
@@ -663,6 +803,6 @@ Sivaramachanran Ganesan \hfill Jan. 26, 2013
   \end{minipage}
 \end{table}
 
-
-
 \end{document}
+
+% vim: nowrap:guioptions+=b

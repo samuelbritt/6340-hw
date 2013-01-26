@@ -1,0 +1,181 @@
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[osf]{mathpazo}
+\usepackage{microtype}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{mathtools}
+\usepackage{bm}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage[pdftex]{lscape}
+\usepackage{lipsum}
+\usepackage{tikz}
+\usepackage{enumitem}
+\usepackage[alsoload=binary]{siunitx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{cancel}
+\usepackage{fancyvrb}
+\usepackage[section]{placeins}
+\usepackage{flafter}
+\usepackage{pdfpages}
+\usepackage[hmargin=1.5in,vmargin=1in]{geometry}
+\usepackage{url}
+\usepackage{hyperref}
+
+% algorithms
+\let\oldgets\gets
+\usepackage{clrscode3e}
+\let\gets\oldgets
+
+% no section numbers
+\setcounter{secnumdepth}{-2}
+
+% a bit more compact, and fixes spacing issues
+\let\originalleft\left
+\let\originalright\right
+\renewcommand{\l}{\mathopen{}\mathclose\bgroup\originalleft}
+\renewcommand{\r}{\aftergroup\egroup\originalright}
+
+% commands
+\renewcommand\vec[1]{\bm{#1}}
+\renewcommand\epsilon{\varepsilon}
+\newcommand\bit{\ensuremath{\set{0,1}}}
+\newcommand\abs[1]{\l\vert #1 \r\vert}
+\newcommand\set[1]{\ensuremath{\l\{#1\r\}}}
+
+% red todos
+\usepackage{marginnote}
+\usepackage{xifthen}% provides \isempty test
+\renewcommand\marginfont{\color{red}}
+
+% Arg 1: vertical shift, Arg 2: content
+\newcommand\Todo[2][]{{\color{red}$^\dagger$}\marginnote{$^\dagger$#2}[#1]}
+
+% wrapper for \Todo: can leave content and/or shift empty
+\newcommand{\todo}[2][0pt]
+  {%
+    \ifthenelse{ \isempty{#2} }%
+      {
+        \Todo[#1]{\textsc{todo}}
+      }
+      {
+        \Todo[#1]{#2}
+      }
+  }
+
+% write in code
+\DefineShortVerb{\|}
+
+\usetikzlibrary
+{
+  positioning,
+  calc,
+  intersections,
+  arrows,
+  shapes.misc,
+  shapes.geometric,
+}
+
+% redefine `\to` to use tikz arrows
+\renewcommand\to{%
+  \mathbin{\tikz[baseline=-.7ex] \draw[->] (0,0) -- +(.4,0);}%
+}
+
+\tikzset
+  {
+    ->,
+    >=latex',
+    shorten >=.5pt,
+    node distance=.5cm and .7cm,
+    auto,
+    fork/.style= {node distance=.5cm and #1},
+    wide fork/.style={fork=1.2cm},
+    block/.style=
+      {
+        draw,
+        inner sep=.3em,
+        rounded rectangle,
+        minimum size=1.7em,
+      },
+    terminal/.style=
+      {
+        block,
+        rectangle,
+        text height=1.5ex,
+        text depth=.25ex,
+      },
+    region/.style=
+      {
+        draw,
+        trapezium,
+      },
+    inline center/.style={baseline=-.5ex},
+    retreating/.style={dashed},
+    cross/.style={dashdotted},
+    forward/.style={dotted},
+  }
+
+% table customizaton
+\newcommand\newrow{\\\addlinespace}
+
+% center columns
+\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
+
+% set
+\newcommand\s[1]{\{#1\}}
+
+% highlight
+\newcommand\hi[1]{\textcolor{red}{#1}}
+
+
+% data analysis
+\newcommand\bottom{\ensuremath{\perp}}
+\newcommand\union{\bigcup}
+\newcommand\Kill{\texttt{KILL}}
+\newcommand\Gen{\texttt{GEN}}
+\newcommand\varfamily{\ttfamily}  % use in tables
+\newcommand\var[1]{\text{\varfamily #1}}
+
+\begin{document}
+\thispagestyle{empty}
+
+\includepdf
+  [
+    pages=1,
+    pagecommand=
+      {
+        \begin{tikzpicture}[remember picture, overlay]
+          \node[text width=6.3in, text height=2.6in]
+          at (current page.north east)
+          {\large
+            Sam Britt, Shriram Swaminathan,\\[1.5em]
+            and Sivaramachandran Ganesan
+          };
+        \end{tikzpicture}
+      }
+  ]
+  {Assignment4ProblemSet3}
+
+\clearpage
+\pagenumbering{arabic}
+
+\noindent
+Sam Britt                \hfill CS 6340      \\
+Shriram Swaminathan      \hfill Assignment 4 \\
+Sivaramachandran Ganesan \hfill Jan. 30, 2013
+
+\begin{enumerate}
+  \item \todo{}
+  \item \todo{}
+\end{enumerate}
+
+\end{document}
+
+% vim: nowrap:guioptions+=b

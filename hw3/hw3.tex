@@ -452,8 +452,7 @@ Sivaramachanran Ganesan \hfill Jan. 26, 2013
           \li               \Then
                               Let $k_{\ell_j} \gets k_{\ell_j} \union \ell_i$
           \li                 Let $k_{\ell_i} \gets k_{\ell_i} \union \ell_j$              \label{li:add-kill-end}
-                          \End
-          \li             \If $\ell_i \in k_{\ell_j}$                                      \label{li:rm-kill-start}
+          \li             \ElseIf $\ell_i \in k_{\ell_j}$                                      \label{li:rm-kill-start}
           \li               \Then
                               Let $k_{\ell_j} \gets k_{\ell_j} - \ell_i$
           \li                 Let $k_{\ell_i} \gets k_{\ell_i} - \ell_j$                   \label{li:rm-kill-end}

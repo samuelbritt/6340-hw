@@ -62,12 +62,12 @@
 \newcommand{\todo}[2][0pt]
   {%
     \ifthenelse{ \isempty{#2} }%
-      {
-        \Todo[#1]{\textsc{todo}}
-      }
-      {
-        \Todo[#1]{#2}
-      }
+      {%
+        \Todo[#1]{\textsc{todo}}%
+      }%
+      {%
+        \Todo[#1]{#2}%
+      }%
   }
 
 % write in code
@@ -172,8 +172,443 @@ Shriram Swaminathan      \hfill Assignment 4 \\
 Sivaramachandran Ganesan \hfill Jan. 30, 2013
 
 \begin{enumerate}
-  \item \todo{}
-  \item \todo{}
+  \item We start with the control dependence graph, augmented with a
+    ``start'' node (below, left). From this, we create the
+    postdominator tree.
+
+    \hfill
+    \begin{minipage}[b]{.4\linewidth}
+      \begin{center}
+        \begin{tikzpicture}
+          \node[terminal]                 (E)  {entry};
+          \node[block,below=of E]         (1)  {1};
+          \node[block,below=of 1]         (2)  {2};
+          \node[block,below=of 2]         (3)  {3};
+          \node[block,below=of 3]         (4)  {4};
+          \node[block,below right=of 4]   (8)  {8};
+          \node[block,below  left=of 4]   (5)  {5};
+          \node[block,below  left=of 5]   (6)  {6};
+          \node[block,below  left=of 8]   (12) {12};
+          \node[block,below=of 12]        (13) {13};
+          \node[block,below right=of 8]   (9)  {9};
+          \node[block,below=of 9]         (10) {10};
+          \node[block,below right=of 13]  (15) {15};
+          \node[block,below  left=of 15]  (23) {23};
+          \node[terminal,below=of 23]     (X)  {exit};
+          \node[block,below right=of 15]  (16) {16};
+          \node[block,below=of 16]        (17) {17};
+          \node[block,below  left=of 17]  (20) {20};
+          \node[block,below right=of 17]  (18) {18};
+          \node[block,below right=of 20]  (J)  {J};
+          \path (E) -- node (mid) {} (X);
+          \node[terminal,left=1.6 of mid]   (S)  {start};
+
+          \path (E) edge (1);
+          \path (1) edge (2);
+          \path (2) edge (3);
+          \path (3) edge (4);
+          \path (4) edge node[swap] {T} (5)
+                    edge node {F} (8);
+          \path (5) edge (6);
+          \path (8) edge node[swap] {F} (12)
+                    edge node {T} (9);
+          \path (9) edge (10);
+          \path (10) edge (15);
+          \path (12) edge (13);
+          \path (13) edge (15);
+          \path (15) edge node[swap] {F} (23)
+                     edge node {T} (16);
+          \path (23) edge (X);
+          \path (16) edge (17);
+          \path (17) edge node[swap] {F} (20)
+                     edge node {T} (18);
+          \path (18) edge (J);
+          \path (20) edge (J);
+
+          \draw (S) |- node[left,near start] {T} (E);
+          \draw (S) |- node[left,near start] {F} (X.190);
+
+          \draw (6) |- (X.170);
+          \draw (J) -- ++(1.3,0) |- (15);
+        \end{tikzpicture}
+      \end{center}
+      Augmented CFG.
+    \end{minipage}
+    \hfill
+    \begin{minipage}[b]{.55\linewidth}
+      \begin{center}
+        \begin{tikzpicture}[on grid,node distance=1 and 1]
+          \node[block] (4)  {4};
+          \node[block, right=of 4] (6) {6};
+          \node[block, right=of 6] (23) {23};
+          \node[terminal, right=of 23] (S)  {start};
+          \node[terminal] at ($(6)!.5!(23) + (0,1)$) (X)  {exit};
+
+          \node[block, below left=of 4] (3) {3};
+          \node[block, below left=1 and .5 of 3] (2) {2};
+          \node[block, below=of 2] (1) {1};
+          \node[terminal, below=of 1] (E) {entry};
+
+          \node[block, below left=of 6] (5) {5};
+
+          \node[block, below= of 23] (15) {15};
+          \node[block, below right=1 and .5 of 15] (17) {17};
+          \node[block, right=of 17] (18) {18};
+          \node[block, right=of 18] (20) {20};
+          \node[block, below left=1 and .5 of 15] (13) {13};
+          \node[block, left=of 13] (10) {10};
+          \node[block, left=of 10] (8) {8};
+
+          \node[block, below=of 10] (9) {9};
+          \node[block, below=of 13] (12) {12};
+          \node[block, below=of 17] (16) {16};
+
+          \draw (X) -- (4);
+          \draw (4) -- (3);
+          \draw (3) -- (2);
+          \draw (2) -- (1);
+          \draw (1) -- (E);
+
+          \draw (X) -- (6);
+          \draw (6) -- (5);
+
+          \draw (X) -- (23);
+          \draw (23) -- (15);
+          \draw (15) -- (8);
+          \draw (15) -- (10);
+          \draw (15) -- (13);
+          \draw (15) -- (17);
+          \draw (15) -- (18);
+          \draw (15) -- (20);
+          \draw (10) -- (9);
+          \draw (13) -- (12);
+          \draw (17) -- (16);
+
+          \draw (X) -- (S);
+        \end{tikzpicture}
+      \end{center}
+      Corresponding postdominator tree.
+    \end{minipage}
+    \hfill~
+
+    We then find the set $S$, where each element in $S$ is an edge
+    $(A, B) \in G$, where $G$ is the above CFG and $B$ does not
+    postdominate $A$. We find that
+    \begin{equation*}
+      S = \text{\s{(start, entry), (4, 5), (4, 8), (8, 9), (8, 12),
+          (15, 16), (17, 18), (17, 20)}}.
+    \end{equation*}
+
+    For each edge $(A,B) \in S$, we find $L$ to be the common ancestor
+    of $A$ and $B$. Finally, the nodes that are control-dependent on
+    $A$ are those the path from $L$ to $B$ on the postdominator tree,
+    including $B$, and including $L$ only if $L=A$. These results are
+    summarized in the following table:
+    \begin{center}
+      \begin{tabular}{cccl}
+        \toprule
+        $(A,B) \in S$ & Condition (T/F) & $L$ & Nodes dependent on
+        $A$ \\
+        \midrule
+        (start, entry) & T & exit & \s{entry, 1, 2, 3, 4} \\
+        (4, 5)         & T & exit & \s{5, 6} \\
+        (4, 8)         & F & exit & \s{8, 15, 23} \\
+        (8, 9)         & T & 15   & \s{9, 10} \\
+        (8, 12)        & F & 15   & \s{12, 13} \\
+        (15, 16)       & T & 15   & \s{15, 16, 17} \\
+        (17, 18)       & T & 15   & \s{18} \\
+        (17, 20)       & F & 15   & \s{20} \\
+        \bottomrule
+      \end{tabular}
+    \end{center}
+
+    The control dependence graph (below) is constructed directly from the
+    above table.
+    \begin{center}
+      \begin{minipage}[b]{.8\linewidth}
+        \begin{center}
+          \begin{tikzpicture}[node distance=1.4 and .8]
+            \node[terminal] (S) {start};
+            \node[block, below=of S] (2) {2};
+            \node[block, left=of 2] (1) {1};
+            \node[terminal, left=of 1] (E) {entry};
+            \node[block, right=of 2] (3) {3};
+            \node[block, right=of 3] (4) {4};
+
+            \node[block, below=of 4] (8) {8};
+            \node[block, left=of 8] (6) {6};
+            \node[block, left=of 6] (5) {5};
+            \node[block, right=of 8] (15) {15};
+            \node[block, right=of 15] (23) {23};
+
+            \node[block, below=of 8] (13) {13};
+            \node[block, left=of 13] (12) {12};
+            \node[block, left=of 12] (10) {10};
+            \node[block, left=of 10] (9) {9};
+
+            \node[block, below=of 15] (16) {16};
+            \node[block, right=of 16] (17) {17};
+
+            \node[block, below left=of 17] (18) {18};
+            \node[block, below right=of 17] (20) {20};
+
+            \path (S)
+            edge node[swap,very near end] {T} (E)
+            edge node[near end, left=.1] {T} (1)
+            edge node[near end] {T} (2)
+            edge node[near end, right=.1] {T} (3)
+            edge node[very near end] {T} (4);
+
+            \path (4)
+            edge node[swap,very near end] {T} (5)
+            edge node[near end, left=.1] {T} (6)
+            edge node[near end] {F} (8)
+            edge node[near end, right=.1] {F} (15)
+            edge node[very near end] {F} (23);
+
+            \path (8)
+            edge node[swap,near end] {T} (9)
+            edge node[swap,near end, left=.1] {T} (10)
+            edge node[near end,left=.1] {F} (12)
+            edge node[near end] {F} (13);
+
+            \path (15)
+            edge node[near end] {T} (16)
+            edge node[near end,right=.1] {T} (17)
+            edge[loop left] node[below=.1] {T} (15);
+
+            \path (17)
+            edge node[near end, swap] {T} (18)
+            edge node[near end] {F} (20);
+          \end{tikzpicture}
+        \end{center}
+        Control dependence graph.
+      \end{minipage}
+    \end{center}
+
+  \item We start by augmenting the CFG with an edge from entry to
+    start, and then reverse it (below, left). From that we create the
+    dominator tree (below, right).
+
+    \hfill
+    \begin{minipage}[b]{.5\linewidth}
+      \begin{center}
+        \begin{tikzpicture}[on grid, node distance=1 and 1]
+          \node[terminal] (X) {exit};
+          \node[block, below left=of X] (6) {6};
+          \node[block, below right=of X] (23) {23};
+
+          \node[block, below left=of 6] (5) {5};
+          \node[block, below=of 5] (4) {4};
+          \node[block, below=of 4] (3) {3};
+          \node[block, below=of 3] (2) {2};
+          \node[block, below=of 2] (1) {1};
+          \node[terminal, below=of 1] (E) {entry};
+
+          \node[block, below=of 23] (15) {15};
+          \node[block, below left=1 and .5 of 15] (13) {13};
+          \node[block, left=of 13] (10) {10};
+          \node[block, right=of 13] (18) {18};
+          \node[block, right=of 18] (20) {20};
+
+          \node[block, below=of 10] (9) {9};
+          \node[block, below=of 13] (12) {12};
+          \node[block, below right=1 and .5 of 9] (8) {8};
+
+          \node[block, below right=1 and .5 of 18] (17) {17};
+          \node[block, below=of 17] (16) {16};
+
+          \draw (X) -- (6);
+          \draw (6) -- (5);
+          \draw (5) -- node {T} (4);
+          \draw (4) -- (3);
+          \draw (3) -- (2);
+          \draw (2) -- (1);
+          \draw (1) -- (E);
+
+          \draw (X) -- (23);
+          \draw (23) -- node {F} (15);
+
+          \draw (15) -- (10);
+          \draw (15) -- (13);
+          \draw (15) -- (18);
+          \draw (15) -- (20);
+
+          \draw (10) -- (9);
+          \draw (9) -- node[swap, near start] {T} (8);
+          \draw (13) -- (12);
+          \draw (12) -- node[near start] {F} (8);
+          \path (8) edge[out=180,in=-60] node[near end, swap] {F} (4);
+
+          \draw (18) -- node[swap] {T} (17);
+          \draw (20) -- node {F} (17);
+          \draw (17) -- (16);
+
+          \draw (16) -- ++(1,0) |- node[swap, near start] {T} (15);
+
+          \draw (X) -- (-3,0) |- (E);
+
+        \end{tikzpicture}
+      \end{center}
+      Reverse CFG.
+    \end{minipage}
+    \hfill
+    \begin{minipage}[b]{.45\linewidth}
+      \begin{center}
+        \begin{tikzpicture}[on grid,node distance=1 and 1]
+          \node[terminal] (X) {exit};
+          \node[block, below left=1 and .5 of X] (6) {6};
+          \node[block, left=of 6] (4)  {4};
+          \node[block, right=of 6] (23) {23};
+          \node[terminal, right=of 23] (E) {entry};
+
+          \node[block, below left=of 4] (3) {3};
+          \node[block, below left=1.2 and .6 of 3] (2) {2};
+          \node[block, below=of 2] (1) {1};
+
+          \node[block, below left=of 6] (5) {5};
+
+          \node[block, below= of 23] (15) {15};
+          \node[block, below right=1 and .5 of 15] (17) {17};
+          \node[block, right=of 17] (18) {18};
+          \node[block, right=of 18] (20) {20};
+          \node[block, below left=1 and .5 of 15] (13) {13};
+          \node[block, left=of 13] (10) {10};
+          \node[block, left=of 10] (8) {8};
+          \node[block, below=of 10] (9) {9};
+          \node[block, below=of 13] (12) {12};
+          \node[block, below=of 17] (16) {16};
+
+          \draw (X) -- (4);
+          \draw (4) -- (3);
+          \draw (3) -- (2);
+          \draw (2) -- (1);
+
+          \draw (X) -- (6);
+          \draw (6) -- (5);
+
+          \draw (X) -- (23);
+          \draw (23) -- (15);
+          \draw (15) -- (8);
+          \draw (15) -- (10);
+          \draw (15) -- (13);
+          \draw (15) -- (17);
+          \draw (15) -- (18);
+          \draw (15) -- (20);
+          \draw (10) -- (9);
+          \draw (13) -- (12);
+          \draw (17) -- (16);
+
+          \draw (X) -- (E);
+        \end{tikzpicture}
+      \end{center}
+      Corresponding dominator tree.
+    \end{minipage}
+    \hfill~
+
+    For each node $n$, we traverse down the reverse CFG (RCFG) until
+    we find a node that $n$ does not dominate; that is, a node that is
+    a child of $n$ in the RCFG but not in the dominator tree. This set
+    of nodes is the dominance frontier of $n$. These are tabulated
+    below.\todo{mention condition if including}
+
+    \begin{center}
+      \begin{minipage}[c]{.4\linewidth}
+        \begin{tabular}{ccc}
+          \toprule
+          \multirow{2}{*}{Block}
+          & Dominance
+          & \multirow{2}{*}{Condition\todo{does ``condition'' even make
+      sense?}} \\
+          & frontier & \\
+          \midrule
+          entry & $\emptyset$& T  \\
+          1     & \s{entry}  & T  \\
+          2     & \s{entry}  & T  \\
+          3     & \s{entry}  & T  \\
+          4     & \s{entry}  & T  \\
+          5     & \s{4}      & T  \\
+          6     & \s{4}      & T  \\
+          8     & \s{4}      & F  \\
+          9     & \s{8}      & T  \\
+          10    & \s{8}      & T  \\
+          12    & \s{8}      & F  \\
+          13    & \s{8}      & F  \\
+          15\todo{does 15 dominate 15?}    & \s{4}      & F  \\
+          16    & \s{15}     & T   \\
+          17    & \s{15}     & T   \\
+          18    & \s{17}     & T   \\
+          20    & \s{17}     & F   \\
+          23    & \s{4}      & F  \\
+          \bottomrule
+        \end{tabular}
+      \end{minipage}
+    \end{center}
+
+    By inverting the dominance frontier sets, we arrive at the control
+    dependence graph below.
+    \begin{center}
+      \begin{minipage}[b]{.8\linewidth}
+        \begin{center}
+          \begin{tikzpicture}[node distance=1.4 and .8]
+            \node[terminal] (E) {entry\todo{note the difference from above}};
+            \node[block, below left=1.4 and .4 of S] (2) {2};
+            \node[block, left=of 2] (1) {1};
+            % \node[terminal, left=of 1] (E) {entry};
+            \node[block, right=of 2] (3) {3};
+            \node[block, right=of 3] (4) {4};
+
+            \node[block, below=of 4] (8) {8};
+            \node[block, left=of 8] (6) {6};
+            \node[block, left=of 6] (5) {5};
+            \node[block, right=of 8] (15) {15};
+            \node[block, right=of 15] (23) {23};
+
+            \node[block, below=of 8] (13) {13};
+            \node[block, left=of 13] (12) {12};
+            \node[block, left=of 12] (10) {10};
+            \node[block, left=of 10] (9) {9};
+
+            \node[block, below=of 15] (16) {16};
+            \node[block, right=of 16] (17) {17};
+
+            \node[block, below left=of 17] (18) {18};
+            \node[block, below right=of 17] (20) {20};
+
+            \path (E)
+            % edge node[swap,very near end] {T} (E)
+            edge node[near end, swap] {T} (1)
+            edge node[near end, left=.1] {T} (2)
+            edge node[near end, right=.1] {T} (3)
+            edge node[near end] {T} (4);
+
+            \path (4)
+            edge node[swap,very near end] {T} (5)
+            edge node[near end, left=.1] {T} (6)
+            edge node[near end] {F} (8)
+            edge node[near end, right=.1] {F} (15)
+            edge node[very near end] {F} (23);
+
+            \path (8)
+            edge node[swap,near end] {T} (9)
+            edge node[swap,near end, left=.1] {T} (10)
+            edge node[near end,left=.1] {F} (12)
+            edge node[near end] {F} (13);
+
+            \path (15)
+            edge node[near end] {T} (16)
+            edge node[near end,right=.1] {T} (17)
+            edge[loop left] node[below=.1] {T\todo{include?}} (15);
+
+            \path (17)
+            edge node[near end, swap] {T} (18)
+            edge node[near end] {F} (20);
+          \end{tikzpicture}
+        \end{center}
+        Control dependence graph.
+      \end{minipage}
+    \end{center}
+
 \end{enumerate}
 
 \end{document}

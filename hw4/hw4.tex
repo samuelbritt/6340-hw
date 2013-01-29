@@ -304,7 +304,8 @@ Sivaramachandran Ganesan \hfill Jan. 30, 2013
     of $A$ and $B$. Finally, the nodes that are control-dependent on
     $A$ are those the path from $L$ to $B$ on the postdominator tree,
     including $B$, and including $L$ only if $L=A$. These results are
-    summarized in the following table:
+    summarized in the following table. Also noted is ``condition,''
+    the label on the edge $(A, B)$.
     \begin{center}
       \begin{tabular}{cccl}
         \toprule
@@ -383,14 +384,14 @@ Sivaramachandran Ganesan \hfill Jan. 30, 2013
             edge node[near end] {F} (20);
           \end{tikzpicture}
         \end{center}
-        Control dependence graph.
+        Control dependence graph constructed using the FOW method.
       \end{minipage}
     \end{center}
 
     \newpage
   \item We start by augmenting the CFG with an edge from entry to
-    start, and then reverse it (below, left). From that we create the
-    dominator tree (below, right).
+    exit, and then reverse the entire graph (below, left). From that
+    we create the dominator tree (below, right).
 
     \hfill
     \begin{minipage}[b]{.5\linewidth}
@@ -510,9 +511,9 @@ Sivaramachandran Ganesan \hfill Jan. 30, 2013
 
     For each node $n$, we traverse down the reverse CFG (RCFG) until
     we find a node that $n$ does not dominate; that is, a node that is
-    a child of $n$ in the RCFG but not in the dominator tree. This set
-    of nodes is the dominance frontier of $n$. These are tabulated
-    below.\todo{mention condition if including}
+    a child of $n$ in the RCFG but not a child of $n$ in the dominator
+    tree. This set of nodes is the dominance frontier of $n$. These
+    are tabulated below.\todo{mention `condition' if including}
 
     \begin{center}
       \begin{minipage}[c]{.4\linewidth}
@@ -550,7 +551,7 @@ Sivaramachandran Ganesan \hfill Jan. 30, 2013
     By inverting the dominance frontier sets, we arrive at the control
     dependence graph below.
     \begin{center}
-      \begin{minipage}[b]{.8\linewidth}
+      \begin{minipage}[b]{.65\linewidth}
         \begin{center}
           \begin{tikzpicture}[node distance=1.4 and .8]
             \node[terminal] (E) {entry\todo{note the difference from above}};
@@ -600,15 +601,16 @@ Sivaramachandran Ganesan \hfill Jan. 30, 2013
             \path (15)
             edge node[near end] {T} (16)
             edge node[near end,right=.1] {T} (17)
-            edge[loop left] node[below=.1] {T\todo{include? can't if
-            15 dom 15}} (15);
+            edge[loop left] node[below=.1] {T\todo{include? can't
+                include if 15 dom 15}} (15);
 
             \path (17)
             edge node[near end, swap] {T} (18)
             edge node[near end] {F} (20);
           \end{tikzpicture}
         \end{center}
-        Control dependence graph.
+        Control dependence graph constructed using the dominance
+        frontier method.\todo{need \emph{P}DG!}
       \end{minipage}
     \end{center}
 

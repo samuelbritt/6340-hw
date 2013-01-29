@@ -550,67 +550,199 @@ Sivaramachandran Ganesan \hfill Jan. 30, 2013
 
     By inverting the dominance frontier sets, we arrive at the control
     dependence graph below.
+
+    % save the CDG to a box so it can be recalled multiple times.
+    % \newsavebox{\CDG}
+    % \sbox{\CDG}{%
+    \newcommand\CDG{%
+    \begin{tikzpicture}[node distance=1.4 and .8,remember picture]
+        \node[terminal] (E) {entry\todo{note the difference from above}};
+        \node[block, below left=1.4 and .4 of E] (2) {2};
+        \node[block, left=of 2] (1) {1};
+        \node[block, right=of 2] (3) {3};
+        \node[block, right=of 3] (4) {4};
+
+        \node[block, below=of 4] (8) {8};
+        \node[block, left=of 8] (6) {6};
+        \node[block, left=of 6] (5) {5};
+        \node[block, right=of 8] (15) {15};
+        \node[block, right=of 15] (23) {23};
+
+        \node[block, below=of 8] (13) {13};
+        \node[block, left=of 13] (12) {12};
+        \node[block, left=of 12] (10) {10};
+        \node[block, left=of 10] (9) {9};
+
+        \node[block, below=of 15] (16) {16};
+        \node[block, right=of 16] (17) {17};
+
+        \node[block, below left=of 17] (18) {18};
+        \node[block, below right=of 17] (20) {20};
+
+        \path (E)
+        edge node[near end, swap] {T} (1)
+        edge node[near end, left=.1] {T} (2)
+        edge node[near end, right=.1] {T} (3)
+        edge node[near end] {T} (4);
+
+        \path (4)
+        edge node[swap,very near end] {T} (5)
+        edge node[near end, left=.1] {T} (6)
+        edge node[near end] {F} (8)
+        edge node[near end, right=.1] {F} (15)
+        edge node[very near end] {F} (23);
+
+        \path (8)
+        edge node[swap,near end] {T} (9)
+        edge node[swap,near end, left=.1] {T} (10)
+        edge node[near end,left=.1] {F} (12)
+        edge node[near end] {F} (13);
+
+        \path (15)
+        edge node[near end] {T} (16)
+        edge node[near end,right=.1] {T} (17)
+        edge[loop left] node[below=.1]
+          {T\todo{include? can't include if 15 dom 15}} (15);
+
+        \path (17)
+        edge node[near end, swap] {T} (18)
+        edge node[near end] {F} (20);
+      \end{tikzpicture}
+    }
+
     \begin{center}
       \begin{minipage}[b]{.65\linewidth}
         \begin{center}
-          \begin{tikzpicture}[node distance=1.4 and .8]
-            \node[terminal] (E) {entry\todo{note the difference from above}};
-            \node[block, below left=1.4 and .4 of S] (2) {2};
-            \node[block, left=of 2] (1) {1};
-            % \node[terminal, left=of 1] (E) {entry};
-            \node[block, right=of 2] (3) {3};
-            \node[block, right=of 3] (4) {4};
-
-            \node[block, below=of 4] (8) {8};
-            \node[block, left=of 8] (6) {6};
-            \node[block, left=of 6] (5) {5};
-            \node[block, right=of 8] (15) {15};
-            \node[block, right=of 15] (23) {23};
-
-            \node[block, below=of 8] (13) {13};
-            \node[block, left=of 13] (12) {12};
-            \node[block, left=of 12] (10) {10};
-            \node[block, left=of 10] (9) {9};
-
-            \node[block, below=of 15] (16) {16};
-            \node[block, right=of 16] (17) {17};
-
-            \node[block, below left=of 17] (18) {18};
-            \node[block, below right=of 17] (20) {20};
-
-            \path (E)
-            % edge node[swap,very near end] {T} (E)
-            edge node[near end, swap] {T} (1)
-            edge node[near end, left=.1] {T} (2)
-            edge node[near end, right=.1] {T} (3)
-            edge node[near end] {T} (4);
-
-            \path (4)
-            edge node[swap,very near end] {T} (5)
-            edge node[near end, left=.1] {T} (6)
-            edge node[near end] {F} (8)
-            edge node[near end, right=.1] {F} (15)
-            edge node[very near end] {F} (23);
-
-            \path (8)
-            edge node[swap,near end] {T} (9)
-            edge node[swap,near end, left=.1] {T} (10)
-            edge node[near end,left=.1] {F} (12)
-            edge node[near end] {F} (13);
-
-            \path (15)
-            edge node[near end] {T} (16)
-            edge node[near end,right=.1] {T} (17)
-            edge[loop left] node[below=.1] {T\todo{include? can't
-                include if 15 dom 15}} (15);
-
-            \path (17)
-            edge node[near end, swap] {T} (18)
-            edge node[near end] {F} (20);
-          \end{tikzpicture}
+          \CDG
         \end{center}
         Control dependence graph constructed using the dominance
-        frontier method.\todo{need \emph{P}DG!}
+        frontier method.
+      \end{minipage}
+    \end{center}
+
+    To add the data dependence subgraph, we need the definition-use
+    pairs. These were computed in Assignment~3; the results are
+    repeated in the following table. In the following, if a source
+    code line contains only one use, the use is denoted by the line
+    number. Otherwise, the notation $\ell.i$ means the $i$th use in
+    line $\ell$.  Definitions in the entry block (that is, program
+    parameters) are denoted by $E$.
+
+    \begin{center}
+      \begin{tabular}{c>{\varfamily}cl}
+        \toprule
+        Use
+        & \multicolumn{1}{c}{Variable}
+        & Reaching Definitions
+        \\
+        \midrule
+        4    & x      & \s{$E$}        \\
+        6    & errval & \s{2}          \\
+        8    & x      & \s{$E$}        \\
+        9    & x      & \s{$E$}        \\
+        12   & eps    & \s{3}          \\
+        13   & x      & \s{$E$}        \\
+        15.1 & x2     & \s{10, 13, 18} \\
+        15.2 & x1     & \s{9, 12, 20}  \\
+        15.3 & eps    & \s{3}          \\
+        16.1 & x1     & \s{9, 12, 20}  \\
+        16.2 & x2     & \s{10, 13, 18} \\
+        17.1 & x3     & \s{16}         \\
+        17.2 & x3     & \s{16}         \\
+        17.3 & x      & \s{$E$}        \\
+        17.4 & x1     & \s{9, 12, 20}  \\
+        17.5 & x1     & \s{9, 12, 20}  \\
+        17.6 & x      & \s{$E$}        \\
+        18   & x3     & \s{16}         \\
+        20   & x3     & \s{16}         \\
+        23   & x3     & \s{1, 16}      \\
+        \bottomrule
+      \end{tabular}
+    \end{center}
+
+    By inverting the reaching definitions sets, we arrive at the
+    definition-use data dependencies, tabulated below.
+    \begin{center}
+      \begin{tabular}{c>{\varfamily}cl}
+        \toprule
+        Definition
+        & \multicolumn{1}{c}{Variable}
+        & Reachable Uses
+        \\
+        \midrule
+        E  & x      & \s{4, 8, 9, 13, 17.3, 17.6} \\
+        1  & x3     & \s{23} \\
+        2  & errval & \s{6} \\
+        3  & eps    & \s{12, 15.3} \\
+        9  & x1     & \s{15.2, 16.1, 17.4, 17.5} \\
+        10 & x2     & \s{15.1, 16.2} \\
+        12 & x1     & \s{15.2, 16.1, 17.4, 17.5} \\
+        13 & x2     & \s{15.1, 16.2} \\
+        16 & x3     & \s{17.1, 17.2, 18, 20, 23} \\
+        18 & x3     & \s{15.1, 16.2} \\
+        20 & x3     & \s{15.2, 16.1, 17.4, 17.5} \\
+        \bottomrule
+      \end{tabular}
+    \end{center}
+
+    Finally, we augment the CDG, drawing an edge from node $A$ to $B$
+    if $A$ contains a defintion of some variable $v$, $B$ contains a
+    use of $v$, and $B$ is reachable by $A$. Edges representing data
+    dependencies are drawn in red in the PDG below.
+
+    \begin{center}
+      \begin{minipage}[b]{.8\linewidth}
+        \begin{center}
+          \CDG
+          \begin{tikzpicture}[
+              remember picture, overlay,
+              data/.style={red},
+            ]
+            \begin{scope}[data]
+              \draw[out=0,in=20] (E) to (4);
+              \draw[out=260,in=145,looseness=1.2] (E) to (8);
+              \draw[out=180,in=180] (E) to (9);
+              \draw[out=260,in=150,looseness=1.2] (E) to (13);
+              \draw[out=0,in=0] (E) to (17);
+
+              \draw[out=135, in=45, looseness=2] (1) to (23);
+
+              \draw[bend left=10] (2) to (6);
+
+              \draw[bend right=30] (3) to (12);
+              \draw[bend left=10] (3) to (15.145);
+
+              \draw[out=-45, in=255, looseness=1.25] (9) to (15.255);
+              \draw[bend right=45] (9) to (16);
+              \draw[bend right=45] (9) to (17);
+
+              \draw[out=-45, in=255, looseness=1.3] (10) to (15.255);
+              \draw[bend right=45] (10) to (16);
+
+              \draw[out=-45, in=255, looseness=1.2] (12) to (15.255);
+              \draw[bend right=45] (12) to (16);
+              \draw[bend right=45] (12) to (17);
+
+              \draw[out=25, in=255] (13) to (15.255);
+              \draw[bend left=25] (13) to (16);
+
+              \draw[bend left=25] (16) to (17);
+              \draw[bend left=10] (16) to (18);
+              \draw[bend right=10] (16) to (20);
+              \draw[out=25, in=255] (16) to (23.255);
+
+              \draw[out=-25, in=-25, looseness=2.5] (18) to (15);
+              \draw[bend left=10] (18) to (16);
+
+              \draw[out=25, in=-25, looseness=1.1] (20) to (15);
+              \draw[bend right=10] (20) to (16);
+              \draw[bend left=10] (20) to (17);
+
+            \end{scope}
+          \end{tikzpicture}
+        \end{center}
+        Program dependence graph. Control dependencies are in black,
+        and data dependencies are in red.
       \end{minipage}
     \end{center}
 

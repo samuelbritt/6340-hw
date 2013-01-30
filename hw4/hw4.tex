@@ -143,6 +143,7 @@
 \newcommand\varfamily{\ttfamily}  % use in tables
 \newcommand\var[1]{\text{\varfamily #1}}
 \DeclareMathOperator\pdom{pdom}
+\DeclareMathOperator\dom{dom}
 
 \begin{document}
 \thispagestyle{empty}
@@ -510,53 +511,54 @@ Sivaramachandran Ganesan \hfill Jan. 30, 2013
     \hfill~
 
     For each node $n$, we traverse down the reverse CFG (RCFG) until
-    we find a node that $n$ does not dominate; that is, a node that is
-    a child of $n$ in the RCFG but not a child of $n$ in the dominator
-    tree. This set of nodes is the dominance frontier of $n$. These
-    are tabulated below.\todo{mention `condition' if including}
+    we find a node that $n$ does not strictly dominate; that is, a
+    node that is a child of $n$ in the RCFG but not a child of $n$ in
+    the dominator tree. This set of nodes is the dominance frontier of
+    $n$. These are tabulated below. Also included, in subscripts where
+    appropriate, is the \emph{condition} of the control dependence. If
+    node $v$ is in the dominance frontier of $n$, then the condition
+    of $v$ is the label on the edge $(u, v)$ where $n \dom u$.
 
     \begin{center}
       \begin{minipage}[c]{.4\linewidth}
-        \begin{tabular}{ccc}
+        \begin{tabular}{c>{$}l<{$}}
           \toprule
-          \multirow{2}{*}{Block}
-          & Dominance
-          & \multirow{2}{*}{Condition\todo{does ``condition'' even make
-      sense?}} \\
-          & frontier & \\
+          Block
+          &
+          \multicolumn{1}{l}{Dominance frontier}
+          \\
           \midrule
-          entry & $\emptyset$& T  \\
-          1     & \s{entry}  & T  \\
-          2     & \s{entry}  & T  \\
-          3     & \s{entry}  & T  \\
-          4     & \s{entry}  & T  \\
-          5     & \s{4}      & T  \\
-          6     & \s{4}      & T  \\
-          8     & \s{4}      & F  \\
-          9     & \s{8}      & T  \\
-          10    & \s{8}      & T  \\
-          12    & \s{8}      & F  \\
-          13    & \s{8}      & F  \\
-          15\todo{does 15 dominate 15?}    & \s{4}      & F  \\
-          16    & \s{15}     & T   \\
-          17    & \s{15}     & T   \\
-          18    & \s{17}     & T   \\
-          20    & \s{17}     & F   \\
-          23    & \s{4}      & F  \\
+          entry & \emptyset           \\
+          1     & \set{\text{entry}}  \\
+          2     & \set{\text{entry}}  \\
+          3     & \set{\text{entry}}  \\
+          4     & \set{\text{entry}}  \\
+          5     & \set{4_T}           \\
+          6     & \set{4_T}           \\
+          8     & \set{4_F}           \\
+          9     & \set{8_T}           \\
+          10    & \set{8_T}           \\
+          12    & \set{8_F}           \\
+          13    & \set{8_F}           \\
+          15    & \set{4_F, 15_T}     \\
+          16    & \set{15_T}          \\
+          17    & \set{15_T}          \\
+          18    & \set{17_T}          \\
+          20    & \set{17_F}          \\
+          23    & \set{4_F}           \\
           \bottomrule
         \end{tabular}
       \end{minipage}
     \end{center}
 
     By inverting the dominance frontier sets, we arrive at the control
-    dependence graph below.
+    dependence graph below. Edges are labeled with the appropriate
+    conditions.
 
     % save the CDG to a box so it can be recalled multiple times.
-    % \newsavebox{\CDG}
-    % \sbox{\CDG}{%
     \newcommand\CDG{%
     \begin{tikzpicture}[node distance=1.4 and .8,remember picture]
-        \node[terminal] (E) {entry\todo{note the difference from above}};
+        \node[terminal] (E) {entry};
         \node[block, below left=1.4 and .4 of E] (2) {2};
         \node[block, left=of 2] (1) {1};
         \node[block, right=of 2] (3) {3};
@@ -580,10 +582,16 @@ Sivaramachandran Ganesan \hfill Jan. 30, 2013
         \node[block, below right=of 17] (20) {20};
 
         \path (E)
-        edge node[near end, swap] {T} (1)
-        edge node[near end, left=.1] {T} (2)
-        edge node[near end, right=.1] {T} (3)
-        edge node[near end] {T} (4);
+        edge (1)
+        edge (2)
+        edge (3)
+        edge (4);
+
+        % \path (E)
+        % edge node[near end, swap] {T} (1)
+        % edge node[near end, left=.1] {T} (2)
+        % edge node[near end, right=.1] {T} (3)
+        % edge node[near end] {T} (4);
 
         \path (4)
         edge node[swap,very near end] {T} (5)
@@ -601,8 +609,7 @@ Sivaramachandran Ganesan \hfill Jan. 30, 2013
         \path (15)
         edge node[near end] {T} (16)
         edge node[near end,right=.1] {T} (17)
-        edge[loop left] node[below=.1]
-          {T\todo{include? can't include if 15 dom 15}} (15);
+        edge[loop left] node[below=.1] {T} (15);
 
         \path (17)
         edge node[near end, swap] {T} (18)
@@ -686,7 +693,7 @@ Sivaramachandran Ganesan \hfill Jan. 30, 2013
     \end{center}
 
     Finally, we augment the CDG, drawing an edge from node $A$ to $B$
-    if $A$ contains a defintion of some variable $v$, $B$ contains a
+    if $A$ contains a definition of some variable $v$, $B$ contains a
     use of $v$, and $B$ is reachable by $A$. Edges representing data
     dependencies are drawn in red in the PDG below.
 

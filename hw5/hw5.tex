@@ -58,7 +58,7 @@
 % red todos
 \usepackage{marginnote}
 \usepackage{xifthen}% provides \isempty test
-\renewcommand\marginfont{\color{red}}
+\renewcommand\marginfont{\color{red}\footnotesize}
 
 % Arg 1: vertical shift, Arg 2: content
 \newcommand\Todo[2][]{{\color{red}$^\dagger$}\marginnote{$^\dagger$#2}[#1]}
@@ -98,7 +98,9 @@
         draw,
         inner sep=.3em,
         rounded rectangle,
-        minimum size=1.7em,
+        text height=1.3ex,
+        text depth=.2ex,
+        minimum size=3.6ex,
       },
     terminal/.style=
       {
@@ -115,12 +117,14 @@
     edge label/.style=
       {
         auto=false,
-        anchor=center,
-        inner sep=.25ex,
+        anchor=mid,
         fill=white,
-        font=\small
+        font=\footnotesize,
+        inner sep=.25ex,
       },
     data edge/.style={red},
+    call edge/.style={dashed},
+    param edge/.style={blue},
   }
 
 % table customizaton
@@ -137,8 +141,8 @@
 \newcommand\union{\bigcup}
 \newcommand\Kill{\texttt{KILL}}
 \newcommand\Gen{\texttt{GEN}}
-\newcommand\varfamily{\ttfamily}  % use in tables
-\newcommand\var[1]{\text{\varfamily #1}}
+\newcommand\codefamily{\ttfamily}  % use in tables
+\newcommand\code[1]{\text{\codefamily #1}}
 \newcommand\blk[1]{\text{#1}}
 \DeclareMathOperator\pdom{pdom}
 \DeclareMathOperator\dom{dom}
@@ -189,7 +193,8 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
     \setlength\parskip{3ex}
   \item Augmented CDGs and PDGs for each of the three programs are
     shown below. Edges corresponding to data dependencies on the PDGs
-    are shown in red, and are labeled by the variable they represent.
+    are shown in red, and are labeled by the variable they
+    represent.\todo{show parameter copying? exit nodes?}
 
     \begin{minipage}[b]{.45\linewidth}
       \centering
@@ -202,7 +207,6 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
         \node[block, below left=of 4] (7) {\blk{7}};
         \node[block, below=of 7] (8) {\blk{8}};
         \node[terminal, below=of 8] (X) {\blk{exit}};
-        \node[terminal] (S) at ($(E)!.5!(X) + (-1.2,0)$) {\blk{start}};
 
         \draw (E) -- (2);
         \draw (2) -- (3);
@@ -212,12 +216,9 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
         \draw (5) |- (4);
         \draw (7) -- (8);
         \draw (8) -- (X);
-
-        \draw (S) |- node[edge label,near start] {T} (E);
-        \draw (S) |- node[edge label,near start] {F} (X);
       \end{tikzpicture}
 
-      The augmented CFG for program M.
+      The CFG for program M.
     \end{minipage}
     %
     \begin{minipage}[b]{.55\linewidth}
@@ -226,12 +227,10 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
           % on grid,
           % node distance=1.4 and 1.4,
         ]
-        \node[terminal] (S) {\blk{start}};
-        \node[block, below=of S] (3) {\blk{3}};
+        \node[terminal] (E) {\blk{entry}};
+        \node[block, below=of E] (3) {\blk{3}};
         \node[block, left=of 3] (2) {\blk{2}};
-        \node[terminal, left=of 2] (E) {\blk{entry}};
         \node[block, right=of 3] (4) {\blk{4}};
-        \node[terminal, right=of 4] (X) {\blk{exit}};
 
         \node[block, below=of 4] (7) {\blk{7}};
         \node[block,  left=of 7] (5) {\blk{5}};
@@ -240,15 +239,15 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
         % This construction allows all labels to be aligned
         % vertically.
         % 1. Find the "anchor" point; here it is a coordinate halfway
-        % between S and 3.
-        \path (S) -- coordinate (anchor) (3);
+        % between E and 3.
+        \path (E) -- coordinate (anchor) (3);
         % 2. Draw a path as wide as necessary horizontally through the
         % anchor point
-        \path[name path=anchor-horiz] (E|-anchor) -- (X|-anchor);
-        \foreach \n/\val in {E/T, 2/T, 3/T, 4/T, X/F}
+        \path[name path=anchor-horiz] (2|-anchor) -- (4|-anchor);
+        \foreach \n/\val in {2/T, 3/T, 4/T}
         {
           % 3. Draw the needed edges, making sure to name the path.
-          \draw[name path=edge] (S) -- (\n);
+          \draw[name path=edge] (E) -- (\n);
           % 4. Finally, drop the node at the intersection of the
           % horizontal path and the edge just drawn.
           \node
@@ -274,9 +273,9 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
 
         \begin{scope}[data edge]
           \draw[out=225, in=210, looseness=1.3]
-            (2) to node[edge label] {\var{i}} (7);
+            (2) to node[edge label] {\code{i}} (7);
           \draw[out=225, in=210, looseness=1.1]
-            (2) to node[edge label] {\var{i}} (4);
+            (2) to node[edge label] {\code{i}} (4);
         \end{scope}
       \end{tikzpicture}
 
@@ -292,38 +291,33 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
         \node[block, below=of 11] (14) {\blk{14}};
         \node[block, below=of 14] (15) {\blk{15}};
         \node[terminal, below=of 15] (X) {\blk{exit}};
-        \node[terminal] at ($(E)!.5!(X) + (-1,0)$) (S) {\blk{start}};
 
         \draw (E) -- (11);
         \draw (11) -- node[edge label] {T} (12);
         \draw (12) -- (14);
-        \draw (11) -- node[edge label] {F} (14);
+        \draw (11) -- node[edge label, anchor=base] {F} (14);
         \draw (14) -- (15);
         \draw (15) -- (X);
-        \draw (S) |- node[edge label, near start] {T} (E);
-        \draw (S) |- node[edge label, near start] {F} (X);
       \end{tikzpicture}
 
-      The augmented CFG for procedure B.
+      The CFG for procedure B.
     \end{minipage}
     %
     \begin{minipage}[b]{.55\linewidth}
       \centering
       \begin{tikzpicture}
-        \node[terminal] (S) {\blk{start}};
-        \node[block, below=of S] (14) {\blk{14}};
+        \node[terminal] (E) {\blk{entry}};
+        \node[block, below=of E] (14) {\blk{14}};
         \node[block, left=of 14] (11) {\blk{11}};
-        \node[terminal, left=of 11] (E) {\blk{entry}};
         \node[block, right=of 14] (15) {\blk{15}};
-        \node[terminal, right=of 15] (X) {\blk{exit}};
 
         \node[block, below=of 11] (12) {\blk{12}};
 
-        \path (S) -- coordinate (anchor) (14);
-        \path[name path=anchor-horiz] (E|-anchor) -- (X|-anchor);
-        \foreach \n/\val in {E/T, 11/T, 14/T, 15/T, X/F}
+        \path (E) -- coordinate (anchor) (14);
+        \path[name path=anchor-horiz] (11|-anchor) -- (15|-anchor);
+        \foreach \n/\val in {11/T, 14/T, 15/T}
         {
-          \draw[name path=edge] (S) -- (\n);
+          \draw[name path=edge] (E) -- (\n);
           \node
             [
               edge label,
@@ -349,10 +343,8 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
         \node[block, below=of E] (18) {\blk{18}};
         \node[block, below right=of 18] (19) {\blk{19}};
         \node[block, below=of 19] (20) {\blk{20}};
-        % \node[terminal, below left=of 20] (X) {\blk{exit}};
-        \coordinate[below left=of 20] (aux) {};
+        \coordinate[below=of 20] (aux) {};
         \node[terminal] at (aux-|18) (X) {\blk{exit}};
-        \node[terminal] at ($(E)!.5!(X) + (-1,0)$) (S) {\blk{start}};
 
         \draw (E) -- (18);
         \draw (18) -- node[edge label] {T} (19);
@@ -360,28 +352,51 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
         \draw (20) -- (X);
         \draw (18) -- node[edge label] {F} (X);
 
-        \draw (S) |- node[near start, edge label] {T} (E);
-        \draw (S) |- node[near start, edge label] {F} (X);
       \end{tikzpicture}
 
-      The augmented CFG for procedure C.
+      The CFG for procedure C.
     \end{minipage}
     %
     \begin{minipage}[b]{.55\linewidth}
       \centering
       \begin{tikzpicture}
-        \node[terminal] (S) {\blk{start}};
-        \node[terminal, below left=of S] (E) {\blk{entry}};
-        \node[block, below=of S] (18) {\blk{18}};
-        \node[terminal, below right=of S] (X) {\blk{exit}};
+        \node[terminal] (E) {\blk{entry}};
+        \node[block, below=of E] (18) {\blk{18}};
         \node[block, below left=of 18] (19) {\blk{19}};
         \node[block, below right=of 18] (20) {\blk{20}};
         
-        \path (S) -- coordinate (anchor) (18);
-        \path[name path=anchor-horiz] (E|-anchor) -- (X|-anchor);
-        \foreach \n/\val in {E/T, 18/T, X/F}
+        \draw  (E) -- node[edge label] {T} (18);
+        \draw (18) -- node[edge label] {T} (19);
+        \draw (18) -- node[edge label] {T} (20);
+
+        \begin{scope}[data edge]
+          % \draw[bend right] (20) to node[edge label] {\code{j}} (18);
+          % \draw[bend left]  (20) to node[edge label] {\code{j}} (19);
+        \end{scope}
+      \end{tikzpicture}
+
+      The PDG for procedure C.\todo{data edges?}
+    \end{minipage}
+
+  \item ~
+
+\end{enumerate}
+    \noindent\makebox[\textwidth]{
+    \begin{tikzpicture}[node distance=1 and .5,scale=.5]
+      \node[terminal] (EM) {\blk{entry $M$}};
+      \node[block, below=of EM] (3) {\blk{3}};
+      \node[block, left=of 3] (2) {\blk{2}};
+      \node[block, right=of 3] (4) {\blk{4}};
+
+      \node[block, below=of 4] (7) {\blk{7}};
+      \node[block,  left=3 of 7] (5) {\blk{5. \code{call B}}};
+      \node[block, right=3 of 7] (8) {\blk{8. \code{call C}}};
+
+      \path (EM) -- coordinate (anchor) (3);
+      \path[name path=anchor-horiz] (2|-anchor) -- (4|-anchor);
+      \foreach \n/\val in {2/T, 3/T, 4/T}
         {
-          \draw[name path=edge] (S) -- (\n);
+          \draw[name path=edge] (EM) -- (\n);
           \node
             [
               edge label,
@@ -390,18 +405,148 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
             at (intersection-1) {\val};
         }
 
-        \draw (18) -- node[edge label] {T} (19);
-        \draw (18) -- node[edge label] {T} (20);
+      \path (4) -- coordinate (anchor) (7);
+      \path[name path=anchor-horiz] (5|-anchor) -- (8|-anchor);
+      \foreach \n/\val in {5/T, 7/F, 8/F}
+        {
+          \draw[name path=edge] (4) -- (\n);
+          \node
+            [
+              edge label,
+              name intersections={of=anchor-horiz and edge}
+            ]
+          at (intersection-1) {\val};
+        }
 
-        \begin{scope}[data edge]
-          % \draw[bend right] (20) to node[edge label] {\var{j}} (18);
-          % \draw[bend left]  (20) to node[edge label] {\var{j}} (19);
-        \end{scope}
-      \end{tikzpicture}
+      % call to B
+      \coordinate[left=-.3 of 5] (MB-aux-in); 
+      \coordinate[right=-.3 of 5] (MB-aux-out); 
+      \foreach \below/\var in {aux/i, i/j, j/sum}
+        {
+          \node[block, below=1 of MB-\below-in.east, anchor=east]
+            (MB-\var-in) {\code{\var\_in = \var}};
+          \draw (5) -- (MB-\var-in.10);
 
-      The PDG for procedure C.\todo{data edges?}
-    \end{minipage}
-\end{enumerate}
+          \node[block, below=1 of MB-\below-out.west, anchor=west]
+            (MB-\var-out) {\code{\var = \var\_out}};
+          \draw (5) -- (MB-\var-out.170);
+        }
+
+      % call to C
+      \coordinate[left=-.3 of 8] (MC-aux-in); 
+      \coordinate[right=-.3 of 8] (MC-aux-out); 
+      \foreach \below/\var in {aux/j, j/sum}
+        {
+          \node[block, below=1 of MC-\below-in.east, anchor=east]
+            (MC-\var-in) {\code{\var\_in = \var}};
+          \draw (8) -- (MC-\var-in.10);
+
+          \node[block, below=1 of MC-\below-out.west, anchor=west]
+            (MC-\var-out) {\code{\var = \var\_out}};
+          \draw (8) -- (MC-\var-out.170);
+        }
+
+      \begin{scope}[data edge]
+        \draw[out=225, in=210, looseness=1.8]
+          (2) to node[edge label] {\code{i}} (7);
+        \draw[out=225, in=210, looseness=1.1]
+          (2) to node[edge label] {\code{i}} (4);
+      \end{scope}
+
+      % Procedure B
+      \node[terminal, below=5 of 5] (EB) {\blk{entry $B$}};
+
+      \coordinate[left=2.2 of EB] (B-aux-in); 
+      \coordinate[right=2.2 of EB] (B-aux-out); 
+      \foreach \below/\var in {aux/i, i/j, j/sum}
+        {
+          \node[block, below=1 of B-\below-in.east, anchor=east]
+            (B-\var-in) {\code{\var = \var\_in}};
+          \draw (EB) -- (B-\var-in.10);
+
+          \node[block, below=1 of B-\below-out.west, anchor=west]
+            (B-\var-out) {\code{\var\_out = \var}};
+          \draw (EB) -- (B-\var-out.170);
+        }
+
+      \coordinate[below=1.5 of EB] (aux);
+      \node[block, below=2.25 of aux] (14) {\blk{14. \code{call C}}};
+      \node[block, left=of aux] (11) {\blk{11}};
+      \node[block, right=of aux] (15) {\blk{15}};
+
+      \node[block, below=of 11] (12) {\blk{12}};
+
+      \draw[call edge] (5) -- (EB);
+      \begin{scope}[param edge, looseness=.7]
+        \foreach \node in {i, j, sum}
+          {
+            \draw[out=180,in=180] (MB-\node-in) to (B-\node-in);
+            \draw[out=0,in=0] (B-\node-out) to (MB-\node-out);
+          }
+      \end{scope}
+
+      \draw (EB) -- node[edge label] {T} (11);
+      \draw (EB) -- node[edge label] {T} (14);
+      \draw (EB) -- node[edge label] {T} (15);
+      \draw (11) -- node[edge label] {T} (12);
+
+      % call to C
+      \coordinate[left=of 14] (BC-aux-in); 
+      \coordinate[right=of 14] (BC-aux-out); 
+      \foreach \below/\var in {aux/j, j/sum}
+        {
+          \node[block, below=1 of BC-\below-in.east, anchor=east]
+            (BC-\var-in) {\code{\var\_in = \var}};
+          \draw (14) -- (BC-\var-in.10);
+
+          \node[block, below=1 of BC-\below-out.west, anchor=west]
+            (BC-\var-out) {\code{\var = \var\_out}};
+          \draw (14) -- (BC-\var-out.170);
+        }
+
+      \begin{scope}[data edge]
+        
+      \end{scope}
+
+      % Procedure C
+      \node[terminal, below=14 of 8] (EC) {\blk{entry $C$}};
+      \node[block, below=of EC] (18) {\blk{18}};
+      \node[block, below left=of 18] (19) {\blk{19}};
+      \node[block, below right=of 18] (20) {\blk{20}};
+
+      \coordinate[left=of EC] (C-aux-in); 
+      \coordinate[right=of EC] (C-aux-out); 
+      \foreach \below/\var in {aux/j, j/sum}
+        {
+          \node[block, below=1 of C-\below-in.east, anchor=east]
+            (C-\var-in) {\code{\var = \var\_in}};
+          \draw (EC) -- (C-\var-in.10);
+
+          \node[block, below=1 of C-\below-out.west, anchor=west]
+            (C-\var-out) {\code{\var\_out = \var}};
+          \draw (EC) -- (C-\var-out.170);
+        }
+
+      \draw[call edge] (8) -- (EC);
+      \begin{scope}[param edge, looseness=.7]
+        \foreach \node in {j, sum}
+          \foreach \call in {M, B}
+          {
+            \draw[out=0,in=180] (\call C-\node-in) to (C-\node-in);
+            \draw[out=0,in=0] (C-\node-out) to (\call C-\node-out);
+          }
+      \end{scope}
+
+      \draw (EC) -- node[edge label] {T} (18);
+      \draw (18) -- node[edge label] {T} (19);
+      \draw (18) -- node[edge label] {T} (20);
+
+      \begin{scope}[data edge]
+        % \draw[bend right] (20) to node[edge label] {\code{j}} (18);
+        % \draw[bend left]  (20) to node[edge label] {\code{j}} (19);
+      \end{scope}
+    \end{tikzpicture}
+    }
 
 \end{document}
 

@@ -25,7 +25,7 @@
 \usepackage[section]{placeins}
 \usepackage{flafter}
 \usepackage{pdfpages}
-\usepackage[hmargin=1.5in,vmargin=1in,showframe]{geometry}
+\usepackage[hmargin=1.5in,vmargin=1in]{geometry}
 \usepackage{url}
 \usepackage{hyperref}
 
@@ -114,6 +114,7 @@
         draw,
         trapezium,
       },
+    selected/.style={fill=gray!30},
     edge label/.style=
       {
         auto=false,
@@ -125,6 +126,7 @@
     data edge/.style={red},
     call edge/.style={dashed},
     param edge/.style={blue},
+    summary edge/.style={green!50!black},
   }
 
 % table customizaton
@@ -146,20 +148,6 @@
 \newcommand\blk[1]{\text{#1}}
 \DeclareMathOperator\pdom{pdom}
 \DeclareMathOperator\dom{dom}
-
-\usepackage{filecontents}
-\begin{filecontents*}{proc-M}
- 1 begin M
- 2   read i, j
- 3   sum = 0
- 4   while i <= 10 do
- 5     call B
- 6   endwhile
- 7   print (i)
- 8   call C
- 9 end M
-\end{filecontents*}
-
 
 \begin{document}
 \thispagestyle{empty}
@@ -258,6 +246,7 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
             at (intersection-1) {\val};
         }
 
+        \draw[loop left] (4) to node {\footnotesize T} (4);
         \draw (4) -- node[edge label] {T} (5);
 
         \begin{scope}[data edge]
@@ -367,180 +356,316 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
       The PDG for procedure C.\todo{data edges?}
     \end{minipage}
 
-\newpage
-  \item ~
-
-    \hspace{-1cm} % a hack, not sure why it's needed
-    \noindent
-    \makebox[\textwidth]{
-    \begin{tikzpicture}[node distance=1 and .5]
-
-      % \draw[-, help lines, dotted, step=.5cm] (-8,-17) grid (12,1);
-      % \draw[-, help lines, step=1cm] (-8,-17) grid (12,1);
-      \path
-        [
-          % clip,
-          use as bounding box,
-          % draw, green,
-        ] (-7.5,-17) rectangle (12,0.5);
-
-      \node[terminal] (EM) {\blk{entry $M$}};
-      \node[block, below=of EM] (4) {\blk{4}};
-      \node[block, left=of 4] (3) {\blk{3}};
-      \node[block, left=of 3] (2) {\blk{2}};
-
-      \node[block, right=of 4] (7) {\blk{7}};
-      \node[block, right=4.5 of 7] (8) {\blk{8. \code{call C}}};
-      \node[block, below left=1.5 and 2 of 4] (5) {\blk{5. \code{call B}}};
-
-      \path (EM) -- coordinate (anchor) (4);
-      \path[name path=anchor-horiz] (2|-anchor) -- (8|-anchor);
-      \foreach \n/\val in {2/T, 3/T, 4/T, 7/T, 8/T}
-        {
-          \draw[name path=edge] (EM) -- (\n);
-          \node
+    \newpage
+  \item
+    \newcommand\SDG{%
+      \par
+      \hspace{-1cm} % a hack, not sure why it's needed
+      \noindent
+      \makebox[\textwidth]{
+        \begin{tikzpicture}[node distance=1 and .5, remember picture]
+          % \draw[-, help lines, dotted, step=.5cm] (-8,-17) grid (12,1);
+          % \draw[-, help lines, step=1cm] (-8,-17) grid (12,1);
+          \path
             [
-              edge label,
-              name intersections={of=anchor-horiz and edge}
-            ]
-            at (intersection-1) {\val};
-        }
+              % clip,
+              use as bounding box,
+              % draw, green,
+            ] (-7.5,-17) rectangle (12,0.5);
 
-      \draw (4) -- node[edge label] {T} (5);
+          \node[terminal] (EM) {\blk{entry $M$}};
+          \node[block, below=of EM] (4) {\blk{4}};
+          \node[block, left=of 4] (3) {\blk{3}};
+          \node[block, left=of 3] (2) {\blk{2}};
 
-      % call to B
-      \coordinate[left=-.3 of 5] (MB-aux-in); 
-      \coordinate[right=-.3 of 5] (MB-aux-out); 
-      \foreach \below/\var in {aux/i, i/j, j/sum}
-        {
-          \node[block, below=1 of MB-\below-in.east, anchor=east]
-            (MB-\var-in) {\code{\var\_in = \var}};
-          \draw (5) -- (MB-\var-in.10);
+          \node[block, right=of 4] (7) {\blk{7}};
+          \node[block, right=4.5 of 7] (8) {\blk{8. \code{call C}}};
+          \node[block, below left=1.5 and 2 of 4] (5) {\blk{5. \code{call B}}};
 
-          \node[block, below=1 of MB-\below-out.west, anchor=west]
-            (MB-\var-out) {\code{\var\ = \var\_out}};
-          \draw (5) -- (MB-\var-out.170);
-        }
+          \path (EM) -- coordinate (anchor) (4);
+          \path[name path=anchor-horiz] (2|-anchor) -- (8|-anchor);
+          \foreach \n/\val in {2/T, 3/T, 4/T, 7/T, 8/T}
+            {
+              \draw[name path=edge] (EM) -- (\n);
+              \node
+                [
+                  edge label,
+                  name intersections={of=anchor-horiz and edge}
+                ]
+                at (intersection-1) {\val};
+            }
 
-      % call to C
-      \coordinate[left=-.3 of 8] (MC-aux-in); 
-      \coordinate[right=-.3 of 8] (MC-aux-out); 
-      \foreach \below/\var in {aux/j, j/sum}
-        {
-          \node[block, below=1 of MC-\below-in.east, anchor=east]
-            (MC-\var-in) {\code{\var\_in = \var}};
-          \draw (8) -- (MC-\var-in.10);
+          \draw[loop left] (4) to node[edge label, above] {T} (4);
+          \draw (4) -- node[edge label] {T} (5);
 
-          \node[block, below=1 of MC-\below-out.west, anchor=west]
-            (MC-\var-out) {\code{\var\ = \var\_out}};
-          \draw (8) -- (MC-\var-out.170);
-        }
+          % call to B
+          \coordinate[left=-.3 of 5] (MB-aux-in); 
+          \coordinate[right=-.3 of 5] (MB-aux-out); 
+          \foreach \below/\var in {aux/i, i/j, j/sum}
+            {
+              \node[block, below=1 of MB-\below-in.east, anchor=east]
+                (MB-\var-in) {\code{\var\_in = \var}};
+              \draw (5) -- (MB-\var-in.10);
 
-      \begin{scope}[data edge]
-        \draw[bend right=35] (2) to node[edge label] {\code{i}} (4);
-        \draw[bend right=35] (2) to node[edge label] {\code{i}} (7);
-      \end{scope}
+              \node[block, below=1 of MB-\below-out.west, anchor=west]
+                (MB-\var-out) {\code{\var\ = \var\_out}};
+              \draw (5) -- (MB-\var-out.170);
+            }
 
-      % Procedure B
-      \node[terminal, below=5 of 5] (EB) {\blk{entry $B$}};
+          % call to C
+          \coordinate[left=-.3 of 8] (MC-aux-in); 
+          \coordinate[right=-.3 of 8] (MC-aux-out); 
+          \foreach \below/\var in {aux/j, j/sum}
+            {
+              \node[block, below=1 of MC-\below-in.east, anchor=east]
+                (MC-\var-in) {\code{\var\_in = \var}};
+              \draw (8) -- (MC-\var-in.10);
 
-      \coordinate[ left=1.2 of EB] (B-aux-in); 
-      \coordinate[right=1.2 of EB] (B-aux-out); 
-      \foreach \below/\var in {aux/i, i/j, j/sum}
-        {
-          \node[block, below=1 of B-\below-in.east, anchor=east]
-            (B-\var-in) {\code{\var\ = \var\_in}};
-          \draw (EB) -- (B-\var-in.10);
+              \node[block, below=1 of MC-\below-out.west, anchor=west]
+                (MC-\var-out) {\code{\var\ = \var\_out}};
+              \draw (8) -- (MC-\var-out.170);
+            }
 
-          \node[block, below=1 of B-\below-out.west, anchor=west]
-            (B-\var-out) {\code{\var\_out = \var}};
-          \draw (EB) -- (B-\var-out.170);
-        }
+          \begin{scope}[data edge]
+            % intra-procedural
+            \draw[bend right=35] (2) to node[edge label] {\code{i}} (4);
+            \draw[bend right=35] (2) to node[edge label] {\code{i}} (7);
 
-      \coordinate[below=1.5 of EB] (aux);
-      \node[block, below=2.25 of aux] (14) {\blk{14. \code{call C}}};
-      \node[block, left=of aux] (11) {\blk{11}};
-      \node[block, right=of aux] (15) {\blk{15}};
+            % call to B
+            \draw[out=180+35, in=90, looseness=1]
+              (2) to node[edge label] {\code{i}} (MB-i-in);
+            \draw[out=180+35, in=180-25, looseness=1.8]
+              (2) to node[edge label] {\code{j}} (MB-j-in);
+            \draw[out=180-35, in=180-25, looseness=1.6]
+              (3) to node[edge label] {\code{sum}} (MB-sum-in);
 
-      \node[block, below=of 11] (12) {\blk{12}};
+            % return from B
+            \draw[out=0, in=-45]
+              (MB-i-out) to node[edge label] {\code{i}} (4);
+            \draw[out=0, in=-45]
+              (MB-i-out) to node[edge label] {\code{i}} (7);
+            \draw[bend left]
+              (MB-i-out) to node[edge label, pos=.45] {\code{i}} (MB-i-in);
+            \draw[out=0, in=180]
+              (MB-j-out) to node[edge label, near start] {\code{j}} (MC-j-in);
+            \draw[out=0, in=180]
+              (MB-sum-out) to node[edge label, near start] {\code{sum}} (MC-sum-in);
 
-      \draw[call edge] (5) -- (EB);
-      \begin{scope}[param edge, looseness=.75]
-        \foreach \node in {i, j, sum}
-          {
-            \draw[out=180+10,in=180-30] (MB-\node-in) to (B-\node-in.north west);
-            \draw[out=30,in=-10] (B-\node-out) to (MB-\node-out);
-          }
-      \end{scope}
+          \end{scope}
 
-      \draw (EB) -- node[edge label] {T} (11);
-      \draw (EB) -- node[edge label] {T} (14);
-      \draw (EB) -- node[edge label] {T} (15);
-      \draw (11) -- node[edge label] {T} (12);
+          \begin{scope}[summary edge]
+            % summary edge B
+            \draw (MB-i-in) to (MB-i-out);
+            \draw (MB-j-in) to (MB-j-out);
+            \draw (MB-sum-in) to (MB-sum-out);
+            % summary edge C
+            \draw (MC-j-in) to (MC-j-out);
+            \draw (MC-sum-in) to (MC-sum-out);
+          \end{scope}
 
-      % call to C
-      \coordinate[left=-.3 of 14] (BC-aux-in); 
-      \coordinate[right=-.3 of 14] (BC-aux-out); 
-      \foreach \below/\var in {aux/j, j/sum}
-        {
-          \node[block, below=1 of BC-\below-in.east, anchor=east]
-            (BC-\var-in) {\code{\var\_in = \var}};
-          \draw (14) -- (BC-\var-in.10);
+          % Procedure B
+          \node[terminal, below=5 of 5] (EB) {\blk{entry $B$}};
 
-          \node[block, below=1 of BC-\below-out.west, anchor=west]
-            (BC-\var-out) {\code{\var\ = \var\_out}};
-          \draw (14) -- (BC-\var-out.170);
-        }
+          \coordinate[ left=1.2 of EB] (B-aux-in); 
+          \coordinate[right=1.2 of EB] (B-aux-out); 
+          \foreach \below/\var in {aux/i, i/j, j/sum}
+            {
+              \node[block, below=1 of B-\below-in.east, anchor=east]
+                (B-\var-in) {\code{\var\ = \var\_in}};
+              \draw (EB) -- (B-\var-in.10);
 
-      \begin{scope}[data edge]
-        
-      \end{scope}
+              \node[block, below=1 of B-\below-out.west, anchor=west]
+                (B-\var-out) {\code{\var\_out = \var}};
+              \draw (EB) -- (B-\var-out.170);
+            }
 
-      % Procedure C
-      \node[terminal] at (8|-EB) (EC) {\blk{entry $C$}};
-      \node[block, below=of EC] (18) {\blk{18}};
-      \node[block, below left=of 18] (19) {\blk{19}};
-      \node[block, below right=of 18] (20) {\blk{20}};
+          \coordinate[below=1.5 of EB] (aux);
+          \node[block, below=2.25 of aux] (14) {\blk{14. \code{call C}}};
+          \node[block, left=of aux] (11) {\blk{11}};
+          \node[block, right=of aux] (15) {\blk{15}};
 
-      \coordinate[left=.2 of EC] (C-aux-in); 
-      \coordinate[right=.2 of EC] (C-aux-out); 
-      \foreach \below/\var in {aux/j, j/sum}
-        {
-          \node[block, below=1 of C-\below-in.east, anchor=east]
-            (C-\var-in) {\code{\var\ = \var\_in}};
-          \draw (EC) -- (C-\var-in.10);
+          \node[block, below=of 11] (12) {\blk{12}};
 
-          \node[block, below=1 of C-\below-out.west, anchor=west]
-            (C-\var-out) {\code{\var\_out = \var}};
-          \draw (EC) -- (C-\var-out.170);
-        }
+          \draw[call edge] (5) -- (EB);
+          \begin{scope}[param edge, looseness=.75]
+            \foreach \node in {i, j, sum}
+              {
+                \draw[out=180+10,in=180-30] (MB-\node-in) to (B-\node-in.north west);
+                \draw[out=30,in=-10] (B-\node-out) to (MB-\node-out);
+              }
+          \end{scope}
 
-      \draw[call edge] (8) -- (EC);
-      \draw[call edge] (14.east) -| ($(EB)!.55!(EC)$) -- (EC.west);
-      \begin{scope}[param edge, looseness=.8]
-        \foreach \node in {j, sum}
-          {
-            \draw[out=180,in=180-30] (MC-\node-in) to (C-\node-in);
-            \draw[out=30,in=0] (C-\node-out) to (MC-\node-out);
-          }
+          \draw (EB) -- node[edge label] {T} (11);
+          \draw (EB) -- node[edge label] {T} (14);
+          \draw (EB) -- node[edge label] {T} (15);
+          \draw (11) -- node[edge label] {T} (12);
 
-        \draw[out=-25,in=-25] (BC-j-in) to (C-j-in);
-        \draw[out=-45,in=-45] (BC-sum-in) to (C-sum-in);
-        \draw[out=0,in=0, looseness=1.3] (C-j-out) to (BC-j-out);
-        \draw[out=0,in=0, looseness=1.3] (C-sum-out) to (BC-sum-out);
-      \end{scope}
+          % call to C
+          \coordinate[left=-.3 of 14] (BC-aux-in); 
+          \coordinate[right=-.3 of 14] (BC-aux-out); 
+          \foreach \below/\var in {aux/j, j/sum}
+            {
+              \node[block, below=1 of BC-\below-in.east, anchor=east]
+                (BC-\var-in) {\code{\var\_in = \var}};
+              \draw (14) -- (BC-\var-in.10);
 
-      \draw (EC) -- node[edge label] {T} (18);
-      \draw (18) -- node[edge label] {T} (19);
-      \draw (18) -- node[edge label] {T} (20);
+              \node[block, below=1 of BC-\below-out.west, anchor=west]
+                (BC-\var-out) {\code{\var\ = \var\_out}};
+              \draw (14) -- (BC-\var-out.170);
+            }
 
-      \begin{scope}[data edge]
-        % \draw[bend right] (20) to node[edge label] {\code{j}} (18);
-        % \draw[bend left]  (20) to node[edge label] {\code{j}} (19);
-      \end{scope}
+          \begin{scope}[data edge]
+            \draw[bend right]
+              (B-sum-in) to node[edge label] {\code{sum}} (11);
+            \draw[out=0, in=180]
+              (B-i-in) to node[edge label, near end] {\code{i}} (15);
+            \draw[out=0, in=180]
+              (15) to node[edge label] {\code{i}} (B-i-out);
 
-    \end{tikzpicture}
-  }
+            % call to C
+            \draw[out=180, in=180-25, looseness=1.8]
+              (B-j-in) to node[edge label, near end] {\code{j}} (BC-j-in);
+            \draw[out=180, in=180-15, looseness=1]
+              (B-sum-in) to node[edge label] {\code{sum}} (BC-sum-in);
+            \draw[in=0, out=25, looseness=1.8]
+              (BC-j-out) to node[edge label, pos=.35] {\code{j}} (B-j-out);
+            \draw[in=0, out=15, looseness=1]
+              (BC-sum-out) to node[edge label, pos=.45] {\code{sum}} (B-sum-out);
+          \end{scope}
+
+
+          \begin{scope}[summary edge]
+            % summary edge C
+            \draw (BC-j-in) to (BC-j-out);
+            \draw (BC-sum-in) to (BC-sum-out);
+          \end{scope}
+
+          % Procedure C
+          \node[terminal] at (8|-EB) (EC) {\blk{entry $C$}};
+          \node[block, below=of EC] (18) {\blk{18}};
+          \node[block, below left=of 18] (19) {\blk{19}};
+          \node[block, below right=of 18] (20) {\blk{20}};
+
+          \coordinate[left=.2 of EC] (C-aux-in); 
+          \coordinate[right=.2 of EC] (C-aux-out); 
+          \foreach \below/\var in {aux/j, j/sum}
+            {
+              \node[block, below=1 of C-\below-in.east, anchor=east]
+                (C-\var-in) {\code{\var\ = \var\_in}};
+              \draw (EC) -- (C-\var-in.10);
+
+              \node[block, below=1 of C-\below-out.west, anchor=west]
+                (C-\var-out) {\code{\var\_out = \var}};
+              \draw (EC) -- (C-\var-out.170);
+            }
+
+          \draw[call edge] (8) -- (EC);
+          \draw[call edge] (14.east) -| ($(EB)!.55!(EC)$) -- (EC.west);
+          \begin{scope}[param edge, looseness=.8]
+            \foreach \node in {j, sum}
+              {
+                \draw[out=180,in=180-30] (MC-\node-in) to (C-\node-in);
+                \draw[out=30,in=0] (C-\node-out) to (MC-\node-out);
+              }
+
+            \draw[out=-25,in=-25] (BC-j-in) to (C-j-in);
+            \draw[out=-45,in=-45] (BC-sum-in) to (C-sum-in);
+            \draw[out=0,in=0, looseness=1.3] (C-j-out) to (BC-j-out);
+            \draw[out=0,in=0, looseness=1.3] (C-sum-out) to (BC-sum-out);
+          \end{scope}
+
+          \draw (EC) -- node[edge label] {T} (18);
+          \draw (18) -- node[edge label] {T} (19);
+          \draw (18) -- node[edge label] {T} (20);
+
+          \begin{scope}[data edge]
+            \draw
+              (C-j-in) to node[edge label, pos=.61] {\code{j}} (18);
+            \draw[out=180, in=225, looseness=2]
+              (C-j-in) to node[edge label] {\code{j}} (19);
+            \draw[out=225, in=225, looseness=1.3]
+              (C-sum-in) to node[edge label, near start] {\code{sum}} (19);
+            \draw
+              (C-j-in) to node[edge label, pos=.65] {\code{j}} (C-j-out);
+            \draw [out=-45, in=0, looseness=2]
+              (20) to node[edge label] {\code{j}} (C-j-out);
+            \draw[bend right=3]
+              (C-sum-in) to node[edge label] {\code{sum}} (C-sum-out);
+            \draw[out=-45, in=-45, looseness=1.3]
+              (19) to node[edge label, near end] {\code{sum}} (C-sum-out);
+          \end{scope}
+        \end{tikzpicture}
+      } % end makebox
+    } % end SDG
+
+    \SDG
+
+  \item In the following, nodes included in the slice are shaded.
+    \begin{enumerate}
+        \newpage
+      \item The slice according to $\l< \blk{7}, \code{i} \r>$
+        \SDG
+        \begin{tikzpicture}[remember picture, overlay]
+          \foreach \style/\n/\txt in
+            {
+              block/2,
+              block/4,
+              block/5/5. \code{call B},
+              block/7,
+              block/15,
+              block/MB-i-in/\code{i\_in = i},
+              block/MB-i-out/\code{i = i\_out},
+              block/B-i-in/\code{i = i\_in},
+              block/B-i-out/\code{i\_out = i},
+              terminal/EM/entry $M$,
+              terminal/EB/entry $B$%
+            }
+            \node[\style, selected] at (\n) {\blk{\txt}};
+        \end{tikzpicture}
+
+        \newpage
+      \item The slice according to $\l< \blk{15}, \code{i} \r>$
+        \SDG
+        \begin{tikzpicture}[remember picture, overlay]
+          \foreach \style/\n/\txt in
+            {
+              terminal/EM/entry $M$,
+              block/2,
+              block/4,
+              block/5/5. \code{call B},
+              block/MB-i-in/\code{i\_in = i},
+              terminal/EB/entry $B$,
+              block/B-i-in/\code{i = i\_in},
+              block/15%
+            }
+            \node[\style, selected] at (\n) {\blk{\txt}};
+        \end{tikzpicture}
+
+        \newpage
+      \item The slice according to $\l< \blk{18}, \code{j} \r>$
+        \SDG
+        \begin{tikzpicture}[remember picture, overlay]
+          \foreach \style/\n/\txt in
+            {
+              terminal/EC/entry $C$,
+              block/18,
+              block/C-j-in/\code{j = j\_in},
+              terminal/EM/entry $M$,
+              block/2,
+              block/4,
+              block/MB-j-in/\code{j\_in = j},
+              block/MB-j-out/\code{j = j\_out},
+              block/5/5. \code{call B},
+              block/MC-j-in/\code{j\_in = j},
+              block/8/8. \code{call C},
+              terminal/EB/entry $B$,
+              block/B-j-in/\code{j = j\_in},
+              block/BC-j-in/\code{j\_in = j},
+              block/14/14. \code{call C}%
+            }
+            \node[\style, selected] at (\n) {\blk{\txt}};
+        \end{tikzpicture}
+    \end{enumerate}
 \end{enumerate}
 
 \end{document}

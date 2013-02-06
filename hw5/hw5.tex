@@ -141,6 +141,12 @@
 % center columns
 \newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
 
+% Centers giant figures, tables, etc, on the page, even within nested
+% enumerates/itemize environments
+\makeatletter
+\newcommand\BigCenter[1]{\par\noindent\hspace*{-\@totalleftmargin}\makebox[\textwidth]{#1}}
+\makeatother
+
 % highlight
 \newcommand\hi[1]{\textcolor{red}{#1}}
 
@@ -185,18 +191,19 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
 
 \begin{enumerate}
     \setlength\parskip{3ex}
-  \item Augmented CDGs and PDGs for each of the three programs are
+  \item CFGs and PDGs for each of the three programs are
     shown below. Edges corresponding to data dependencies on the PDGs
-    are shown in red, and are labeled by the variable they
-    represent.\todo{show parameter copying? exit nodes?}
+    are shown in red (\SampleEdge{data edge}), and are labeled by the
+    variable they represent. Formal- and actual-in and out definition
+    nodes are not included, so there are very few data dependencies.
 
-    \begin{minipage}[b]{.45\linewidth}
+    \begin{minipage}[b]{.5\linewidth}
       \centering
-      \begin{tikzpicture}
+      \begin{tikzpicture}%[node distance=.5 and 1]
         \node[terminal] (E) {\blk{entry}};
-        \node[block, below=of E] (2) {\blk{2}};
-        \node[block, below=of 2] (3) {\blk{3}};
-        \node[block, below=of 3] (4) {\blk{4}};
+        \node[block, right=of E] (2) {\blk{2}};
+        \node[block, right=of 2] (3) {\blk{3}};
+        \node[block, right=of 3] (4) {\blk{4}};
         \node[block, below right=of 4] (5) {\blk{5}};
         \node[block, below left=of 4] (7) {\blk{7}};
         \node[block, below=of 7] (8) {\blk{8}};
@@ -212,15 +219,18 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
         \draw (8) -- (X);
       \end{tikzpicture}
 
-      The CFG for program M.
+      The CFG for program $M$.
     \end{minipage}
     %
-    \begin{minipage}[b]{.55\linewidth}
+    \begin{minipage}[b]{.5\linewidth}
       \centering
       \begin{tikzpicture}[
           % on grid,
           % node distance=1.4 and 1.4,
         ]
+        % \draw[help lines, -, step=.5] (-3.5,-3.5) grid      (3.25,.5);
+        \path[use as bounding box]    (-3.5,-3.5) rectangle (3.25,.5);
+
         \node[terminal] (E) {\blk{entry}};
         \node[block, below=of E] (4) {\blk{4}};
         \node[block, left=of 4] (3) {\blk{3}};
@@ -263,14 +273,14 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
         \end{scope}
       \end{tikzpicture}
 
-      The PDG for program M.
+      The PDG for program $M$.
     \end{minipage}
 
-    \begin{minipage}[b]{.45\linewidth}
+    \begin{minipage}[b]{.5\linewidth}
       \centering
       \begin{tikzpicture}
         \node[terminal] (E) {\blk{entry}};
-        \node[block, below=of E] (11) {\blk{11}};
+        \node[block, right=of E] (11) {\blk{11}};
         \node[block, right=of 11] (12) {\blk{12}};
         \node[block, below=of 11] (14) {\blk{14}};
         \node[block, below=of 14] (15) {\blk{15}};
@@ -284,10 +294,10 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
         \draw (15) -- (X);
       \end{tikzpicture}
 
-      The CFG for procedure B.
+      The CFG for procedure $B$.
     \end{minipage}
     %
-    \begin{minipage}[b]{.55\linewidth}
+    \begin{minipage}[b]{.5\linewidth}
       \centering
       \begin{tikzpicture}
         \node[terminal] (E) {\blk{entry}};
@@ -317,14 +327,14 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
         \end{scope}
       \end{tikzpicture}
 
-      The PDG for procedure B.\todo{data edges?}
+      The PDG for procedure $B$.
     \end{minipage}
 
-    \begin{minipage}[b]{.45\linewidth}
+    \begin{minipage}[b]{.5\linewidth}
       \centering
       \begin{tikzpicture}%[on grid, node distance=1 and 1]
         \node[terminal] (E) {\blk{entry}};
-        \node[block, below=of E] (18) {\blk{18}};
+        \node[block, right=of E] (18) {\blk{18}};
         \node[block, below right=of 18] (19) {\blk{19}};
         \node[block, below=of 19] (20) {\blk{20}};
         \coordinate[below=of 20] (aux) {};
@@ -335,13 +345,12 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
         \draw (19) -- (20);
         \draw (20) -- (X);
         \draw (18) -- node[edge label] {F} (X);
-
       \end{tikzpicture}
 
-      The CFG for procedure C.
+      The CFG for procedure $C$.
     \end{minipage}
     %
-    \begin{minipage}[b]{.55\linewidth}
+    \begin{minipage}[b]{.5\linewidth}
       \centering
       \begin{tikzpicture}
         \node[terminal] (E) {\blk{entry}};
@@ -359,11 +368,10 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
         \end{scope}
       \end{tikzpicture}
 
-      The PDG for procedure C.\todo{data edges?}
+      The PDG for procedure $C$.
     \end{minipage}
 
     \newpage
-
   \item In the following SDG,
     control dependencies are in solid black (\SampleEdge{}),
     call edges are in dashed black (\SampleEdge{call edge}),
@@ -372,25 +380,18 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
     and transitive flow dependence edges are in green (\SampleEdge{trans edge}).
 
     \newcommand\SDG{%
-      \par
-      \hspace{-1cm} % a hack, not sure why it's needed
-      \noindent
-      \makebox[\textwidth]{
+      \BigCenter{%
         \begin{tikzpicture}[node distance=1 and .5, remember picture]
-          % \draw[-, help lines, dotted, step=.5cm] (-8,-17) grid (12,1);
-          % \draw[-, help lines, step=1cm] (-8,-17) grid (12,1);
-          \path
-            [
-              % clip,
-              use as bounding box,
-              % draw, green,
-            ] (-7.5,-17) rectangle (12,0.5);
+          % \draw[-, help lines, step=.5cm] (-7.75,-17) grid      (12,0.5);
+          \path[use as bounding box]      (-7.75,-17) rectangle (12,0.5);
 
           \node[terminal] (EM) {\blk{entry $M$}};
-          \node[block, below=of EM] (4) {\blk{4}};
-          \node[block, left=of 4] (3) {\blk{3}};
+          \node[block, draw=none, below=of EM] (aux1) {};
+          \node[block, draw=none, left=of aux1] (aux2) {};
+          \node[block] at ($(aux1)!.5!(aux2)$) (3) {\blk{3}};
           \node[block, left=of 3] (2) {\blk{2}};
 
+          \node[block, right=of 3] (4) {\blk{4}};
           \node[block, right=of 4] (7) {\blk{7}};
           \node[block, right=4.5 of 7] (8) {\blk{8. \code{call C}}};
           \node[block, below left=1.5 and 2 of 4] (5) {\blk{5. \code{call B}}};
@@ -412,17 +413,17 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
           \draw (4) -- node[edge label] {T} (5);
 
           % call to B
-          \coordinate[left=-.3 of 5] (MB-aux-in); 
-          \coordinate[right=-.3 of 5] (MB-aux-out); 
+          \coordinate[left=-.2 of 5] (MB-aux-in); 
+          \coordinate[right=-.2 of 5] (MB-aux-out); 
           \foreach \below/\var in {aux/i, i/j, j/sum}
             {
               \node[block, below=1 of MB-\below-in.east, anchor=east]
                 (MB-\var-in) {\code{\var\_in = \var}};
-              \draw (5) -- (MB-\var-in.10);
+              \draw (5) -- (MB-\var-in.5);
 
               \node[block, below=1 of MB-\below-out.west, anchor=west]
                 (MB-\var-out) {\code{\var\ = \var\_out}};
-              \draw (5) -- (MB-\var-out.170);
+              \draw (5) -- (MB-\var-out.180 - 5);
             }
 
           % call to C
@@ -436,7 +437,7 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
 
               \node[block, below=1 of MC-\below-out.west, anchor=west]
                 (MC-\var-out) {\code{\var\ = \var\_out}};
-              \draw (8) -- (MC-\var-out.170);
+              \draw (8) -- (MC-\var-out.180 - 10);
             }
 
           \begin{scope}[data edge]
@@ -470,7 +471,6 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
               (MB-j-out) to node[edge label, near start] {\code{j}} (MC-j-in);
             \draw[out=0, in=180]
               (MB-sum-out) to node[edge label, near start] {\code{sum}} (MC-sum-in);
-
           \end{scope}
 
           \begin{scope}[trans edge]
@@ -581,7 +581,7 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
             }
 
           \draw[call edge] (8) -- (EC);
-          \draw[call edge] (14.east) -| ($(EB)!.55!(EC)$) -- (EC.west);
+          \draw[call edge] (14) -| ($(EB)!.58!(EC)$) |- (EC);
           \begin{scope}[param edge, looseness=.8]
             \foreach \node in {j, sum}
               {
@@ -616,7 +616,7 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
               (19) to node[edge label, near end] {\code{sum}} (C-sum-out);
           \end{scope}
         \end{tikzpicture}
-      } % end makebox
+      } % end BigCenter
     } % end SDG
 
     \SDG
@@ -624,10 +624,16 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
     \newpage
   \item In the following, nodes included in the slice are shaded. Each
         slice was constructed using the two-phase method on the SDG as
-        described in lecture.
+        described in lecture. Although the slices were determined via
+        the algorithm, intuitive justificiations for the inclusion of
+        select nodes are added where appropriate.
     \begin{enumerate}
       \item The slice according to the criterion $\l< \blk{7},
-        \code{i} \r>$.
+        \code{i} \r>$. It is interesting that line~4 is included in the
+        slice. While it does not directly affect the value of
+        \code{i}, its execution does control whether the call to $B$
+        on line~5 is executed, and procudre $B$ does define \code{i}.
+        Therefore, line~4 must be included.
         \SDG
         \begin{tikzpicture}[remember picture, overlay]
           \foreach \style/\n/\txt in
@@ -649,7 +655,16 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
 
         \newpage
       \item The slice according to the criterion $\l< \blk{15},
-        \code{i} \r>$.
+        \code{i} \r>$. It is perhaps not at first intuitive why the
+        formal out definition of \code{i\_out} in procedure $B$ and the
+        actual out definition of \code{i} in in the call to $B$ on
+        line~5 of program $M$ are included in the slice. However,
+        because $B$ is called on line~5 inside a loop, the formal and
+        actual out definitions of \code{i} in $B$ and $M$ eventually
+        determine the evaluation of the loop condition in line~4 in
+        $M$, which controls the further evaluation of $B$ (and thus
+        line~15) inside the loop. Therefore, the inclusion of the
+        formal and actual out definitions is justified.
         \SDG
         \begin{tikzpicture}[remember picture, overlay]
           \foreach \style/\n/\txt in
@@ -670,7 +685,20 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
 
         \newpage
       \item The slice according to the criterion $\l< \blk{18},
-        \code{j} \r>$.
+        \code{j} \r>$. Again, it is perhaps not clear why the formal
+        out defininition of \code{j\_out} in procedure $C$, or indeed
+        line~20, is included in the slice. But, since $C$ is perhaps
+        called many times (because $B$ is called inside a loop on
+        line~5, and $B$ calls $C$ on line~14), then the (potential)
+        re-definition of \code{j} on line~20 and as a formal out
+        parameter will affect the use of \code{j} on line~18 the next
+        time $C$ is called. However, the actual out definition of
+        \code{j} on the call to $C$ in line~8 of program $M$ is
+        \emph{not} included in the slice, because by the time the call
+        on line~8 returns, there is no way for $C$ to be re-entered.
+        Therefore, the use of \code{j} line~18 is not affected by the
+        actual out definition of \code{j} on line~8. 
+
         \SDG
         \begin{tikzpicture}[remember picture, overlay]
           \foreach \style/\n/\txt in

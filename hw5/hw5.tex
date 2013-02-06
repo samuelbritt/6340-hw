@@ -80,6 +80,7 @@
   positioning,
   calc,
   intersections,
+  backgrounds,
   arrows,
   shapes.misc,
   shapes.geometric,
@@ -126,7 +127,7 @@
     data edge/.style={red},
     call edge/.style={dashed},
     param edge/.style={blue},
-    summary edge/.style={green!50!black},
+    trans edge/.style={green!50!black},
     inline center/.style={baseline=-.6ex},
   }
 
@@ -368,7 +369,7 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
     call edges are in dashed black (\SampleEdge{call edge}),
     data dependencies are in red (\SampleEdge{data edge}),
     parameter in and out edges are in blue (\SampleEdge{param edge}),
-    and summary edges are in green (\SampleEdge{summary edge}).
+    and transitive flow dependence edges are in green (\SampleEdge{trans edge}).
 
     \newcommand\SDG{%
       \par
@@ -440,8 +441,8 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
 
           \begin{scope}[data edge]
             % intra-procedural
-            \draw[bend right=35] (2) to node[edge label] {\code{i}} (4);
-            \draw[bend right=35] (2) to node[edge label] {\code{i}} (7);
+            \draw[bend right=35] (2) to node[edge label, pos=.6] {\code{i}} (4);
+            \draw[bend right=35] (2) to node[edge label, pos=.6] {\code{i}} (7);
 
             % call to B
             \draw[out=180+35, in=90, looseness=1]
@@ -456,8 +457,15 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
               (MB-i-out) to node[edge label] {\code{i}} (4);
             \draw[out=0, in=-45]
               (MB-i-out) to node[edge label] {\code{i}} (7);
+
+            % loop carried edges
             \draw[bend left]
               (MB-i-out) to node[edge label, pos=.45] {\code{i}} (MB-i-in);
+            \draw[bend left]
+              (MB-j-out) to node[edge label, pos=.45] {\code{j}} (MB-j-in);
+            \draw[bend left]
+              (MB-sum-out) to node[edge label] {\code{sum}} (MB-sum-in);
+
             \draw[out=0, in=180]
               (MB-j-out) to node[edge label, near start] {\code{j}} (MC-j-in);
             \draw[out=0, in=180]
@@ -465,12 +473,12 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
 
           \end{scope}
 
-          \begin{scope}[summary edge]
-            % summary edge B
+          \begin{scope}[trans edge]
+            % trans edge B
             \draw (MB-i-in) to (MB-i-out);
             \draw (MB-j-in) to (MB-j-out);
             \draw (MB-sum-in) to (MB-sum-out);
-            % summary edge C
+            % trans edge C
             \draw (MC-j-in) to (MC-j-out);
             \draw (MC-sum-in) to (MC-sum-out);
           \end{scope}
@@ -498,7 +506,9 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
 
           \node[block, below=of 11] (12) {\blk{12}};
 
-          \draw[call edge] (5) -- (EB);
+          \begin{scope}[on background layer]
+            \draw[call edge] (5) -- (EB);
+          \end{scope}
           \begin{scope}[param edge, looseness=.75]
             \foreach \node in {i, j, sum}
               {
@@ -529,7 +539,7 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
           \begin{scope}[data edge]
             \draw[bend right]
               (B-sum-in) to node[edge label] {\code{sum}} (11);
-            \draw[out=0, in=180]
+            \draw[out=0, in=160, looseness=1.7]
               (B-i-in) to node[edge label, near end] {\code{i}} (15);
             \draw[out=0, in=180]
               (15) to node[edge label] {\code{i}} (B-i-out);
@@ -545,8 +555,8 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
               (BC-sum-out) to node[edge label, pos=.45] {\code{sum}} (B-sum-out);
           \end{scope}
 
-          \begin{scope}[summary edge]
-            % summary edge C
+          \begin{scope}[trans edge]
+            % trans edge C
             \draw (BC-j-in) to (BC-j-out);
             \draw (BC-sum-in) to (BC-sum-out);
           \end{scope}
@@ -612,9 +622,12 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
     \SDG
 
     \newpage
-  \item In the following, nodes included in the slice are shaded.
+  \item In the following, nodes included in the slice are shaded. Each
+        slice was constructed using the two-phase method on the SDG as
+        described in lecture.
     \begin{enumerate}
-      \item The slice according to $\l< \blk{7}, \code{i} \r>$
+      \item The slice according to the criterion $\l< \blk{7},
+        \code{i} \r>$.
         \SDG
         \begin{tikzpicture}[remember picture, overlay]
           \foreach \style/\n/\txt in
@@ -635,7 +648,8 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
         \end{tikzpicture}
 
         \newpage
-      \item The slice according to $\l< \blk{15}, \code{i} \r>$
+      \item The slice according to the criterion $\l< \blk{15},
+        \code{i} \r>$.
         \SDG
         \begin{tikzpicture}[remember picture, overlay]
           \foreach \style/\n/\txt in
@@ -645,33 +659,45 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
               block/4,
               block/5/5. \code{call B},
               block/MB-i-in/\code{i\_in = i},
+              block/MB-i-out/\code{i = i\_out},
               terminal/EB/entry $B$,
               block/B-i-in/\code{i = i\_in},
+              block/B-i-out/\code{i\_out = i},
               block/15%
             }
             \node[\style, selected] at (\n) {\blk{\txt}};
         \end{tikzpicture}
 
         \newpage
-      \item The slice according to $\l< \blk{18}, \code{j} \r>$
+      \item The slice according to the criterion $\l< \blk{18},
+        \code{j} \r>$.
         \SDG
         \begin{tikzpicture}[remember picture, overlay]
           \foreach \style/\n/\txt in
             {
               terminal/EC/entry $C$,
               block/18,
+              block/20,
               block/C-j-in/\code{j = j\_in},
+              block/C-j-out/\code{j\_out = j},
               terminal/EM/entry $M$,
               block/2,
               block/4,
               block/MB-j-in/\code{j\_in = j},
               block/MB-j-out/\code{j = j\_out},
+              block/MB-i-in/\code{i\_in = i},
+              block/MB-i-out/\code{i = i\_out},
               block/5/5. \code{call B},
               block/MC-j-in/\code{j\_in = j},
               block/8/8. \code{call C},
               terminal/EB/entry $B$,
+              block/B-i-out/\code{i\_out = i},
+              block/B-j-out/\code{j\_out = j},
+              block/15,
+              block/B-i-in/\code{i = i\_in},
               block/B-j-in/\code{j = j\_in},
               block/BC-j-in/\code{j\_in = j},
+              block/BC-j-out/\code{j = j\_out},
               block/14/14. \code{call C}%
             }
             \node[\style, selected] at (\n) {\blk{\txt}};

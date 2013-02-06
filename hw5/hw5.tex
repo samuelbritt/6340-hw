@@ -692,12 +692,15 @@ Sivaramachandran Ganesan \hfill Feb. 6, 2013
         line~5, and $B$ calls $C$ on line~14), then the (potential)
         re-definition of \code{j} on line~20 and as a formal out
         parameter will affect the use of \code{j} on line~18 the next
-        time $C$ is called. However, the actual out definition of
-        \code{j} on the call to $C$ in line~8 of program $M$ is
-        \emph{not} included in the slice, because by the time the call
-        on line~8 returns, there is no way for $C$ to be re-entered.
-        Therefore, the use of \code{j} line~18 is not affected by the
-        actual out definition of \code{j} on line~8. 
+        time $C$ is called. Similarly, statements dealing with the
+        definition of \code{i}, for example line~15, are included,
+        because they control when $B$ (and therefore $C$) gets called
+        on line~5. However, the actual out definition of \code{j} on
+        the call to $C$ in line~8 of program $M$ is \emph{not}
+        included in the slice, because by the time the call on line~8
+        returns, there is no way for $C$ to be re-entered.  Therefore,
+        the use of \code{j} line~18 is not affected by the actual out
+        definition of \code{j} on line~8. 
 
         \SDG
         \begin{tikzpicture}[remember picture, overlay]

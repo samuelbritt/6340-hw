@@ -1,0 +1,278 @@
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[osf]{mathpazo}
+\usepackage{microtype}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{mathtools}
+\usepackage{bm}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage[pdftex]{lscape}
+\usepackage{lipsum}
+\usepackage{tikz}
+\usepackage{enumitem}
+\usepackage[alsoload=binary]{siunitx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{cancel}
+\usepackage{fancyvrb}
+\usepackage[section]{placeins}
+\usepackage{flafter}
+\usepackage{pdfpages}
+\usepackage[hmargin=1.5in,vmargin=1in]{geometry}
+\usepackage{url}
+\usepackage{hyperref}
+
+% algorithms
+\let\oldgets\gets
+\usepackage{clrscode3e}
+\let\gets\oldgets
+\usepackage{listings}
+
+% no section numbers
+\setcounter{secnumdepth}{-2}
+
+% a bit more compact, and fixes spacing issues
+\let\originalleft\left
+\let\originalright\right
+\renewcommand{\l}{\mathopen{}\mathclose\bgroup\originalleft}
+\renewcommand{\r}{\aftergroup\egroup\originalright}
+
+% commands
+\renewcommand\vec[1]{\bm{#1}}
+\renewcommand\epsilon{\varepsilon}
+\newcommand\bit{\ensuremath{\set{0,1}}}
+\newcommand\abs[1]{\l\vert #1 \r\vert}
+\newcommand\set[1]{\ensuremath{\l\{#1\r\}}}
+% redefine `\to` to use tikz arrows
+\renewcommand\to{%
+  \mathbin{\tikz[baseline=-.7ex] \draw[->] (0,0) -- +(.4,0);}%
+}
+
+% red todos
+\usepackage{marginnote}
+\usepackage{xifthen}% provides \isempty test
+\renewcommand\marginfont{\color{red}\footnotesize}
+
+% Arg 1: vertical shift, Arg 2: content
+\newcommand\Todo[2][]{{\color{red}$^\dagger$}\marginnote{$^\dagger$#2}[#1]}
+
+% wrapper for \Todo: can leave content and/or shift empty
+\newcommand{\todo}[2][0pt]
+  {%
+    \ifthenelse{ \isempty{#2} }%
+      {%
+        \Todo[#1]{\textsc{todo}}%
+      }%
+      {%
+        \Todo[#1]{#2}%
+      }%
+  }
+
+\usetikzlibrary
+{
+  positioning,
+  calc,
+  intersections,
+  backgrounds,
+  arrows,
+  shapes.misc,
+  shapes.geometric,
+}
+
+\tikzset
+  {
+    ->,
+    >=latex',
+    shorten >=.5pt,
+    node distance=.8cm and .8cm,
+    fork/.style= {node distance=.8cm and #1},
+    wide fork/.style={fork=1.6cm},
+    block/.style=
+      {
+        draw,
+        inner sep=.3em,
+        rounded rectangle,
+        text height=1.3ex,
+        text depth=.2ex,
+        minimum size=3.6ex,
+      },
+    terminal/.style=
+      {
+        block,
+        rectangle,
+        text height=1.5ex,
+        text depth=.25ex,
+      },
+    joint/.style={fill=black,circle,inner sep=0,minimum size=5pt},
+    region/.style=
+      {
+        draw,
+        trapezium,
+      },
+    selected/.style={fill=gray!30},
+    edge label/.style=
+      {
+        auto=false,
+        anchor=mid,
+        fill=white,
+        font=\footnotesize,
+        inner sep=.25ex,
+      },
+    data edge/.style={red},
+    call edge/.style={dashed},
+    param edge/.style={blue},
+    trans edge/.style={green!50!black},
+    inline center/.style={baseline=-.6ex},
+  }
+
+\newcommand\SampleEdge[1]{%
+  \tikz[inline center] \draw[#1] (0,0) -- (.7,0);%
+}
+
+% table customizaton
+\newcommand\newrow{\\\addlinespace}
+
+% center columns
+\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
+
+% Centers giant figures, tables, etc, on the page, even within nested
+% enumerates/itemize environments
+\makeatletter
+\newcommand\BigCenter[1]{\par\noindent\hspace*{-\@totalleftmargin}\makebox[\textwidth]{#1}}
+\makeatother
+
+% highlight
+\newcommand\hi[1]{\textcolor{red}{#1}}
+
+% data analysis
+\newcommand\bottom{\ensuremath{\perp}}
+\newcommand\union{\bigcup}
+\newcommand\Kill{\texttt{KILL}}
+\newcommand\Gen{\texttt{GEN}}
+\newcommand\codefamily{\ttfamily}  % use in tables
+\newcommand\code[1]{\text{\codefamily #1}}
+\newcommand\blk[1]{\text{#1}}
+\DeclareMathOperator\pdom{pdom}
+\DeclareMathOperator\dom{dom}
+
+\begin{document}
+\thispagestyle{empty}
+
+\includepdf
+  [
+    pages=1,
+    pagecommand=
+      {
+        \begin{tikzpicture}[remember picture, overlay]
+          \node[text width=6.3in, text height=2.6in]
+          at (current page.north east)
+          {\large
+            Sam Britt, Shriram Swaminathan,\\[1.5em]
+            and Sivaramachandran Ganesan
+          };
+        \end{tikzpicture}
+      }
+  ]
+  {Assignment8ProblemSet5}
+
+\clearpage
+\pagenumbering{arabic}
+
+\noindent
+Sam Britt                \hfill CS 6340      \\
+Shriram Swaminathan      \hfill Assignment 8 \\
+Sivaramachandran Ganesan \hfill Mar. 12, 2013
+
+The CFG for \verb|tritype.c|:
+
+\begin{center}
+  \begin{tikzpicture}[on grid, node distance=1 and 1]
+    \node[terminal] (E) {Entry};
+    \node[block, below=of E] (33) {\blk{33}};
+    \node[block, below=of 33] (41) {\blk{41}};
+    \node[block, below left=of 41] (43) {\blk{43}};
+
+    \node[block, below right=of 41] (47) {\blk{47}};
+    \node[block, below=of 47] (48) {\blk{48}};
+    \node[block, below right=of 48] (49) {\blk{49}};
+    \node[block, below=2 of 48] (50) {\blk{50}};
+    \node[block, below right=of 50] (51) {\blk{51}};
+    \node[block, below=2 of 50] (52) {\blk{52}};
+    \node[block, below right=of 52] (53) {\blk{53}};
+    \node[block, below=2 of 52] (55) {\blk{55}};
+
+    \node[block, below right=1 and 2 of 55] (63) {\blk{63}};
+    \node[block, below right=of 63] (64) {\blk{64}};
+    \node[block, below left=of 63] (66) {\blk{66}};
+
+    \node[block, below left=1 and 2 of 55] (74) {\blk{74}};
+    \node[block, below right=of 74] (75) {\blk{75}};
+    \node[block, below left=of 74] (76) {\blk{76}};
+    \node[block, below right=of 76] (77) {\blk{77}};
+    \node[block, below left=of 76] (78) {\blk{78}};
+    \node[block, below right=of 78] (79) {\blk{79}};
+    \node[block, below left=of 78] (80) {\blk{80}};
+    \node[block, below right=of 80] (81) {\blk{81}};
+    \node[block, below left=of 80] (83) {\blk{83}};
+
+    \node[joint, below=2 of 63] (J63) {};
+    \node[joint, below=2 of 80] (J80) {};
+
+    \path (E|-J80) -- +(0,-2) node[block] (86) {86};
+    \node[terminal, below=of 86] (X) {Exit};
+
+    \draw (E) -- (33);
+    \draw (33) -- (41);
+    \draw (41) -- node[edge label] {T} (43);
+    \draw (41) -- node[edge label] {F} (47);
+    \draw (47) -- (48);
+    \draw (48) -- node[edge label] {T} (49);
+    \draw (49) -- (50);
+    \draw (48) -- node[edge label] {F} (50);
+    \draw (50) -- node[edge label] {T} (51);
+    \draw (51) -- (52);
+    \draw (50) -- node[edge label] {F} (52);
+    \draw (52) -- node[edge label] {T} (53);
+    \draw (53) -- (55);
+    \draw (52) -- node[edge label] {F} (55);
+
+    \draw (55) -- node[edge label] {T} (63);
+    \draw (63) -- node[edge label] {T} (64);
+    \draw (64) -- (J63);
+    \draw (63) -- node[edge label] {F} (66);
+    \draw (66) -- (J63);
+
+    \draw (55) -- node[edge label] {F} (74);
+    \draw (74) -- node[edge label] {T} (75);
+    \draw (74) -- node[edge label] {F} (76);
+    \draw (76) -- node[edge label] {T} (77);
+    \draw (76) -- node[edge label] {F} (78);
+    \draw (78) -- node[edge label] {T} (79);
+    \draw (78) -- node[edge label] {F} (80);
+    \draw (80) -- node[edge label] {T} (81);
+    \draw (80) -- node[edge label] {F} (83);
+
+    \draw (83) -- (J80);
+    \draw (81) -- (J80);
+    \draw (79) to[bend left] (J80);
+    \draw (77) to[bend left] (J80);
+    \draw (75) to[bend left] (J80);
+
+    \draw (J63) to[bend left] (86);
+    \draw (J80) to[bend right=15] (86);
+    \draw (43) -- ++(-4.8,0) |- (86);
+
+    \draw (86) -- (X);
+  \end{tikzpicture}
+\end{center}
+
+\end{document}
+
+% vim: nowrap:guioptions+=b

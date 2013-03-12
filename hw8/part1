@@ -1,0 +1,23 @@
+# Assignment 8 Part 1
+# 
+# Sam Britt
+# Shriram Swaminathan
+# Sivaramachandran Ganesan
+
+"invalid lengths" 	10 1 1 invalid
+"invalid lengths" 	1 10 1 invalid
+"invalid lengths" 	1 1 10 invalid
+"negative input" 	-1 1 1 invalid
+"negative input" 	1 -1 1 invalid
+"negative input" 	1 1 -1 invalid
+"zero input" 		0 1 1 invalid
+"zero input" 		1 0 1 invalid
+"zero input" 		1 1 0 invalid
+"invalid input"		w 1 1 invalid
+"invalid input"		1 w 1 invalid
+"invalid input"		1 1 w invalid
+"equilateral"		1 1 1 equilateral
+"scalene"			4 3 2 scalene
+"isosceles"			2 2 3 isosceles
+"isosceles"			2 3 2 isosceles
+"isosceles"			3 2 2 isosceles

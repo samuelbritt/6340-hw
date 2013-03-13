@@ -272,101 +272,116 @@ The CFG for \code{tritype.c} can be seen in Figure~\ref{fig:cfg}.
 \end{table}
 
 \begin{table}[htbp]
+  \setlength{\tabcolsep}{4pt}
   \centering
   \begin{minipage}[t]{\linewidth}
     \centering
     \caption{Multiple Condition Coverage, per Condition}
     \label{tab:condition-coverage}
     \BigCenter{
-    \begin{tabular}{c *{3}{c} c @{\hskip 1cm} c *{3}{c}}
+    \begin{tabular}{c c *{3}{c} c @{\hskip .5cm} c c *{3}{c}}
       \toprule
       Decision
+      & Coverage
       & \multicolumn{3}{c}{Conditions}
       &
       & Decision
+      & Coverage
       & \multicolumn{3}{c}{Conditions}
       \\
-      (Covered?)
+      (Result)
+      &
       & \multicolumn{3}{c}{(Possible Evaluations)}
       &
-      & (Covered?)
+      & (Result)
+      &
       & \multicolumn{3}{c}{(Possible Evaluations)}
       \\
-      \cmidrule{1-4}
-      \cmidrule{6-9}
+      \cmidrule{1-5}
+      \cmidrule{7-11}
       \\
       Line 41
-      & \code{i <= 0}
-      & \code{j <= 0}
-      & \code{k < 0}
+      & Covered?
+      & \code{i<=0}
+      & \code{j<=0}
+      & \code{k<0}
       &
       & Line 63
-      & \code{i+j <= k}
-      & \code{j+k <= i}
-      & \code{i+k < j} \\
-      % Line 41                 % Line 63
-      \cmidrule(lr){1-4}        \cmidrule(lr){6-9}
-      \covered & F & F & F    && \covered & F & F & F \\
-      \covered & F & F & T    && \covered & F & F & T \\
-      \covered & F & T & F    &&          & F & T & F \\
-               & F & T & T    &&          & F & T & T \\
-      \covered & T & F & F    &&          & T & F & F \\
-               & T & F & T    &&          & T & F & T \\
-               & T & T & F    &&          & T & T & F \\
-               & T & T & T    &&          & T & T & T \\
+      & Covered?
+      & \code{i+j<=k}
+      & \code{j+k<=i}
+      & \code{i+k<j} \\
+      % Line 41                   % Line 63
+      \cmidrule(lr){1-5}          \cmidrule(lr){7-11}
+      F & \covered & F & F & F    && F & \covered & F & F & F \\
+      T & \covered & F & F & T    && T & \covered & F & F & T \\
+      T & \covered & F & T & F    && T &          & F & T & F \\
+      T &          & F & T & T    && T &          & F & T & T \\
+      T & \covered & T & F & F    && T &          & T & F & F \\
+      T &          & T & F & T    && T &          & T & F & T \\
+      T &          & T & T & F    && T &          & T & T & F \\
+      T &          & T & T & T    && T &          & T & T & T \\
       \\
       Line 48
+      & Covered?
       & \code{i == j}
       & &
       &
       & Line 74
-      & \code{triang > 3} \\
-      % Line 48                 % Line 74
-      \cmidrule(lr){1-2}        \cmidrule(lr){6-7}
-      \covered & T  &  &      && \covered & T  &  &  \\
-      \covered & F  &  &      && \covered & F  &  &  \\
+      & Covered?
+      & \code{triang>3} \\
+      % Line 48                   % Line 74
+      \cmidrule(lr){1-3}          \cmidrule(lr){7-9}
+      T & \covered & T  &  &      && T & \covered & T  &  &  \\
+      F & \covered & F  &  &      && F & \covered & F  &  &  \\
       \\
       Line 50
-      & \code{i == k}
+      & Covered?
+      & \code{i==k}
       & &
       &
       & Line 76
-      & \code{triang == 1}
-      & \code{i+j > k} \\
-      % Line 50                  % Line 76
-      \cmidrule(lr){1-2}         \cmidrule(lr){6-8}
-      \covered & T  &  &      &&          & F & F & \\
-      \covered & F  &  &      && \covered & F & T & \\
-               &    &  &      && \covered & T & F & \\
-               &    &  &      && \covered & T & T & \\
+      & Covered?
+      & \code{triang==1}
+      & \code{i+j>k} \\
+      % Line 50                   % Line 76
+      \cmidrule(lr){1-3}          \cmidrule(lr){7-10}
+      T & \covered & T &  &       && F &          & F & F & \\
+      F & \covered & F &  &       && F & \covered & F & T & \\
+        &          &   &  &       && F & \covered & T & F & \\
+        &          &   &  &       && T & \covered & T & T & \\
       \\
       Line 52
-      & \code{j == k}
+      & Covered?
+      & \code{j==k}
       & &
       &
       & Line 78
-      & \code{triang == 2}
-      & \code{i+k > j} \\
-      % Line 52                  Line 78
-      \cmidrule(lr){1-2}         \cmidrule(lr){6-8}
-      \covered & T  &  &      &&          & F & F & \\
-      \covered & F  &  &      && \covered & F & T & \\
-               &    &  &      && \covered & T & F & \\
-               &    &  &      && \covered & T & T & \\
+      & Covered?
+      & \code{triang==2}
+      & \code{i+k>j} \\
+      % Line 52                   Line 78
+      \cmidrule(lr){1-3}          \cmidrule(lr){7-10}
+      T & \covered & T  &  &      && F &          & F & F & \\
+      F & \covered & F  &  &      && F & \covered & F & T & \\
+        &          &    &  &      && F & \covered & T & F & \\
+        &          &    &  &      && T & \covered & T & T & \\
       \\
       Line 55
-      & \code{triang == 0}
+      & Covered?
+      & \code{triang==0}
       & &
       &
       & Line 80
-      & \code{triang == 3}
-      & \code{j+k > i} \\
-      % Line 55                  Line 80
-      \cmidrule(lr){1-2}         \cmidrule(lr){6-8}
-      \covered & T  &  &      &&          & F & F & \\
-      \covered & F  &  &      && \covered & F & T & \\
-               &    &  &      && \covered & T & F & \\
-               &    &  &      && \covered & T & T & \\
+      & Covered?
+      & \code{triang==3}
+      & \code{j+k>i} \\
+      % Line 55                   Line 80
+      \cmidrule(lr){1-3}          \cmidrule(lr){7-10}
+      T & \covered & T &  &       && F &          & F & F & \\
+      F & \covered & F &  &       && F & \covered & F & T & \\
+        &          &   &  &       && F & \covered & T & F & \\
+        &          &   &  &       && T & \covered & T & T & \\
       \bottomrule
     \end{tabular}
     } % Bigcenter

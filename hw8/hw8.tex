@@ -162,6 +162,7 @@
 \DeclareMathOperator\pdom{pdom}
 \DeclareMathOperator\dom{dom}
 
+\newcommand\covered{\ensuremath{\checkmark}}
 \begin{document}
 \thispagestyle{empty}
 
@@ -190,88 +191,274 @@ Sam Britt                \hfill CS 6340      \\
 Shriram Swaminathan      \hfill Assignment 8 \\
 Sivaramachandran Ganesan \hfill Mar. 12, 2013
 
-The CFG for \verb|tritype.c|:
+Our test suite is shown in Table~\ref{tab:test_suite} below. We
+achieved \SI{100}{\percent} statement coverage with this test suite;
+Table~\ref{tab:statement-coverage} shows which tests cover each
+statement.
 
-\begin{center}
-  \begin{tikzpicture}[on grid, node distance=1 and 1]
-    \node[terminal] (E) {Entry};
-    \node[block, below=of E] (33) {\blk{33}};
-    \node[block, below=of 33] (41) {\blk{41}};
-    \node[block, below left=of 41] (43) {\blk{43}};
+Our test suite achieved \SI{65.8}{\percent} multiple condition
+coverage.
 
-    \node[block, below right=of 41] (47) {\blk{47}};
-    \node[block, below=of 47] (48) {\blk{48}};
-    \node[block, below right=of 48] (49) {\blk{49}};
-    \node[block, below=2 of 48] (50) {\blk{50}};
-    \node[block, below right=of 50] (51) {\blk{51}};
-    \node[block, below=2 of 50] (52) {\blk{52}};
-    \node[block, below right=of 52] (53) {\blk{53}};
-    \node[block, below=2 of 52] (55) {\blk{55}};
+The CFG for \code{tritype.c} can be seen in Figure~\ref{fig:cfg}.
 
-    \node[block, below right=1 and 2 of 55] (63) {\blk{63}};
-    \node[block, below right=of 63] (64) {\blk{64}};
-    \node[block, below left=of 63] (66) {\blk{66}};
+\begin{table}[htbp]
+  \centering
+  \begin{minipage}[t]{.8\linewidth}
+    \centering
+    \caption{Test Suite}
+    \label{tab:test_suite}
+    \begin{tabular}{c l c l}
+      \toprule
+      Test ID & Reason for test & Input: $(i, j, k)$  & Expected Result \\
+      \midrule
+      1  & Violation of triangle inequality & $(10,  1,  1)$        & invalid      \\
+      2  & Violation of triangle inequality & $( 1, 10,  1)$        & invalid      \\
+      3  & Violation of triangle inequality & $( 1,  1, 10)$        & invalid      \\
+      4  & Negative input                   & $(-1,  1,  1)$        & invalid      \\
+      5  & Negative input                   & $( 1, -1,  1)$        & invalid      \\
+      6  & Negative input                   & $( 1,  1, -1)$        & invalid      \\
+      7  & Zero input                       & $( 0,  1,  1)$        & invalid      \\
+      8  & Zero input                       & $( 1,  0,  1)$        & invalid      \\
+      9  & Zero input                       & $( 1,  1,  0)$        & invalid      \\
+      10 & Invalid input                    & $( \code{w},  1,  1)$ & invalid      \\
+      11 & Invalid input                    & $( 1,  \code{w},  1)$ & invalid      \\
+      12 & Invalid input                    & $( 1,  1,  \code{w})$ & invalid      \\
+      13 & Equilateral                      & $( 1,  1,  1)$        & equilateral  \\
+      14 & Scalene                          & $( 4,  3,  2)$        & scalene      \\
+      15 & Isosceles                        & $( 2,  2,  3)$        & isosceles    \\
+      16 & Isosceles                        & $( 2,  3,  2)$        & isosceles    \\
+      17 & Isosceles                        & $( 3,  2,  2)$        & isosceles    \\
+      \bottomrule
+    \end{tabular}
+  \end{minipage}
+\end{table}
 
-    \node[block, below left=1 and 2 of 55] (74) {\blk{74}};
-    \node[block, below right=of 74] (75) {\blk{75}};
-    \node[block, below left=of 74] (76) {\blk{76}};
-    \node[block, below right=of 76] (77) {\blk{77}};
-    \node[block, below left=of 76] (78) {\blk{78}};
-    \node[block, below right=of 78] (79) {\blk{79}};
-    \node[block, below left=of 78] (80) {\blk{80}};
-    \node[block, below right=of 80] (81) {\blk{81}};
-    \node[block, below left=of 80] (83) {\blk{83}};
+\begin{table}[htbp]
+  \centering
+  \begin{minipage}[t]{\linewidth}
+    \centering
+    \caption{Statement Coverage per Test}
+    \label{tab:statement-coverage}
+    \BigCenter{
+    \begin{tabular}{c *{24}{c}}
+      \toprule
+      \multirow{2}{*}{Test ID}
+      & \multicolumn{24}{c}{Statement line number} \\
+      \cmidrule(lr){2-25}
+      % Test ID
+              & 33       & 41       & 43       & 47       & 48       & 49       & 50       & 51       & 52       & 53       & 55       & 63       & 64       & 66       & 74       & 75       & 76       & 77       & 78       & 79       & 80       & 81       & 83       & 86            \\
+      \midrule
+      1       & \covered & \covered &          & \covered & \covered &          & \covered &          & \covered & \covered & \covered &          &          &          & \covered &          & \covered &          & \covered &          & \covered &           & \covered & \covered     \\
+      2       & \covered & \covered &          & \covered & \covered &          & \covered & \covered & \covered &          & \covered &          &          &          & \covered &          & \covered &          & \covered &          & \covered &           & \covered & \covered     \\
+      3       & \covered & \covered &          & \covered & \covered & \covered & \covered &          & \covered &          & \covered &          &          &          & \covered &          & \covered &          & \covered &          & \covered &           & \covered & \covered     \\
+      4       & \covered & \covered & \covered &          &          &          &          &          &          &          &          &          &          &          &          &          &          &          &          &          &          &           &          & \covered     \\
+      5       & \covered & \covered & \covered &          &          &          &          &          &          &          &          &          &          &          &          &          &          &          &          &          &          &           &          & \covered     \\
+      6       & \covered & \covered & \covered &          &          &          &          &          &          &          &          &          &          &          &          &          &          &          &          &          &          &           &          & \covered     \\
+      7       & \covered & \covered & \covered &          &          &          &          &          &          &          &          &          &          &          &          &          &          &          &          &          &          &           &          & \covered     \\
+      8       & \covered & \covered & \covered &          &          &          &          &          &          &          &          &          &          &          &          &          &          &          &          &          &          &           &          & \covered     \\
+      9       & \covered & \covered &          & \covered & \covered & \covered & \covered &          & \covered &          & \covered &          &          &          & \covered &          & \covered & \covered &          &          &          &           &          & \covered     \\
+      10      & \covered & \covered & \covered &          &          &          &          &          &          &          &          &          &          &          &          &          &          &          &          &          &          &           &          & \covered     \\
+      11      & \covered & \covered &          & \covered & \covered &          & \covered &          & \covered &          & \covered & \covered & \covered &          &          &          &          &          &          &          &          &           &          & \covered     \\
+      12      & \covered & \covered &          & \covered & \covered & \covered & \covered &          & \covered &          & \covered &          &          &          & \covered &          & \covered & \covered &          &          &          &           &          & \covered     \\
+      13      & \covered & \covered &          & \covered & \covered &          & \covered & \covered & \covered & \covered & \covered &          &          &          & \covered & \covered &          &          &          &          &          &           &          & \covered     \\
+      14      & \covered & \covered &          & \covered & \covered &          & \covered &          & \covered &          & \covered & \covered &          & \covered &          &          &          &          &          &          &          &           &          & \covered     \\
+      15      & \covered & \covered &          & \covered & \covered & \covered & \covered &          & \covered &          & \covered &          &          &          & \covered &          & \covered & \covered &          &          &          &           &          & \covered     \\
+      16      & \covered & \covered &          & \covered & \covered &          & \covered & \covered & \covered &          & \covered &          &          &          & \covered &          & \covered &          & \covered & \covered &          &           &          & \covered     \\
+      17      & \covered & \covered &          & \covered & \covered &          & \covered &          & \covered & \covered & \covered &          &          &          & \covered &          & \covered &          & \covered &          & \covered & \covered  &          & \covered     \\
+      \bottomrule
+    \end{tabular}
+  }
+  \end{minipage}
+\end{table}
 
-    \node[joint, below=2 of 63] (J63) {};
-    \node[joint, below=2 of 80] (J80) {};
+\begin{table}[htbp]
+  \centering
+  \begin{minipage}[t]{\linewidth}
+    \centering
+    \caption{Multiple Condition Coverage, per Condition}
+    \label{tab:condition-coverage}
+    \BigCenter{
+    \begin{tabular}{c *{3}{c} c @{\hskip 1cm} c *{3}{c}}
+      \toprule
+      Decision
+      & \multicolumn{3}{c}{Conditions}
+      &
+      & Decision
+      & \multicolumn{3}{c}{Conditions}
+      \\
+      (Covered?)
+      & \multicolumn{3}{c}{(Possible Evaluations)}
+      &
+      & (Covered?)
+      & \multicolumn{3}{c}{(Possible Evaluations)}
+      \\
+      \cmidrule{1-4}
+      \cmidrule{6-9}
+      \\
+      Line 41
+      & \code{i <= 0}
+      & \code{j <= 0}
+      & \code{k < 0}
+      &
+      & Line 63
+      & \code{i+j <= k}
+      & \code{j+k <= i}
+      & \code{i+k < j} \\
+      % Line 41                 % Line 63
+      \cmidrule(lr){1-4}        \cmidrule(lr){6-9}
+      \covered & F & F & F    && \covered & F & F & F \\
+      \covered & F & F & T    && \covered & F & F & T \\
+      \covered & F & T & F    &&          & F & T & F \\
+               & F & T & T    &&          & F & T & T \\
+      \covered & T & F & F    &&          & T & F & F \\
+               & T & F & T    &&          & T & F & T \\
+               & T & T & F    &&          & T & T & F \\
+               & T & T & T    &&          & T & T & T \\
+      \\
+      Line 48
+      & \code{i == j}
+      & &
+      &
+      & Line 74
+      & \code{triang > 3} \\
+      % Line 48                 % Line 74
+      \cmidrule(lr){1-2}        \cmidrule(lr){6-7}
+      \covered & T  &  &      && \covered & T  &  &  \\
+      \covered & F  &  &      && \covered & F  &  &  \\
+      \\
+      Line 50
+      & \code{i == k}
+      & &
+      &
+      & Line 76
+      & \code{triang == 1}
+      & \code{i+j > k} \\
+      % Line 50                  % Line 76
+      \cmidrule(lr){1-2}         \cmidrule(lr){6-8}
+      \covered & T  &  &      &&          & F & F & \\
+      \covered & F  &  &      && \covered & F & T & \\
+               &    &  &      && \covered & T & F & \\
+               &    &  &      && \covered & T & T & \\
+      \\
+      Line 52
+      & \code{j == k}
+      & &
+      &
+      & Line 78
+      & \code{triang == 2}
+      & \code{i+k > j} \\
+      % Line 52                  Line 78
+      \cmidrule(lr){1-2}         \cmidrule(lr){6-8}
+      \covered & T  &  &      &&          & F & F & \\
+      \covered & F  &  &      && \covered & F & T & \\
+               &    &  &      && \covered & T & F & \\
+               &    &  &      && \covered & T & T & \\
+      \\
+      Line 55
+      & \code{triang == 0}
+      & &
+      &
+      & Line 80
+      & \code{triang == 3}
+      & \code{j+k > i} \\
+      % Line 55                  Line 80
+      \cmidrule(lr){1-2}         \cmidrule(lr){6-8}
+      \covered & T  &  &      &&          & F & F & \\
+      \covered & F  &  &      && \covered & F & T & \\
+               &    &  &      && \covered & T & F & \\
+               &    &  &      && \covered & T & T & \\
+      \bottomrule
+    \end{tabular}
+    } % Bigcenter
+  \end{minipage}
+\end{table}
 
-    \path (E|-J80) -- +(0,-2) node[block] (86) {86};
-    \node[terminal, below=of 86] (X) {Exit};
+\begin{figure}[htbp]
+  \centering
+  \begin{minipage}[t]{.8\linewidth}
+    \centering
+    \begin{tikzpicture}[on grid, node distance=1 and 1]
+      \node[terminal] (E) {Entry};
+      \node[block, below=of E] (33) {\blk{33}};
+      \node[block, below=of 33] (41) {\blk{41}};
+      \node[block, below left=of 41] (43) {\blk{43}};
 
-    \draw (E) -- (33);
-    \draw (33) -- (41);
-    \draw (41) -- node[edge label] {T} (43);
-    \draw (41) -- node[edge label] {F} (47);
-    \draw (47) -- (48);
-    \draw (48) -- node[edge label] {T} (49);
-    \draw (49) -- (50);
-    \draw (48) -- node[edge label] {F} (50);
-    \draw (50) -- node[edge label] {T} (51);
-    \draw (51) -- (52);
-    \draw (50) -- node[edge label] {F} (52);
-    \draw (52) -- node[edge label] {T} (53);
-    \draw (53) -- (55);
-    \draw (52) -- node[edge label] {F} (55);
+      \node[block, below right=of 41] (47) {\blk{47}};
+      \node[block, below=of 47] (48) {\blk{48}};
+      \node[block, below right=of 48] (49) {\blk{49}};
+      \node[block, below=2 of 48] (50) {\blk{50}};
+      \node[block, below right=of 50] (51) {\blk{51}};
+      \node[block, below=2 of 50] (52) {\blk{52}};
+      \node[block, below right=of 52] (53) {\blk{53}};
+      \node[block, below=2 of 52] (55) {\blk{55}};
 
-    \draw (55) -- node[edge label] {T} (63);
-    \draw (63) -- node[edge label] {T} (64);
-    \draw (64) -- (J63);
-    \draw (63) -- node[edge label] {F} (66);
-    \draw (66) -- (J63);
+      \node[block, below right=1 and 2 of 55] (63) {\blk{63}};
+      \node[block, below right=of 63] (64) {\blk{64}};
+      \node[block, below left=of 63] (66) {\blk{66}};
 
-    \draw (55) -- node[edge label] {F} (74);
-    \draw (74) -- node[edge label] {T} (75);
-    \draw (74) -- node[edge label] {F} (76);
-    \draw (76) -- node[edge label] {T} (77);
-    \draw (76) -- node[edge label] {F} (78);
-    \draw (78) -- node[edge label] {T} (79);
-    \draw (78) -- node[edge label] {F} (80);
-    \draw (80) -- node[edge label] {T} (81);
-    \draw (80) -- node[edge label] {F} (83);
+      \node[block, below left=1 and 2 of 55] (74) {\blk{74}};
+      \node[block, below right=of 74] (75) {\blk{75}};
+      \node[block, below left=of 74] (76) {\blk{76}};
+      \node[block, below right=of 76] (77) {\blk{77}};
+      \node[block, below left=of 76] (78) {\blk{78}};
+      \node[block, below right=of 78] (79) {\blk{79}};
+      \node[block, below left=of 78] (80) {\blk{80}};
+      \node[block, below right=of 80] (81) {\blk{81}};
+      \node[block, below left=of 80] (83) {\blk{83}};
 
-    \draw (83) -- (J80);
-    \draw (81) -- (J80);
-    \draw (79) to[bend left] (J80);
-    \draw (77) to[bend left] (J80);
-    \draw (75) to[bend left] (J80);
+      \node[joint, below=2 of 63] (J63) {};
+      \node[joint, below=2 of 80] (J80) {};
 
-    \draw (J63) to[bend left] (86);
-    \draw (J80) to[bend right=15] (86);
-    \draw (43) -- ++(-4.8,0) |- (86);
+      \path (E|-J80) -- +(0,-2) node[block] (86) {86};
+      \node[terminal, below=of 86] (X) {Exit};
 
-    \draw (86) -- (X);
-  \end{tikzpicture}
-\end{center}
+      \draw (E) -- (33);
+      \draw (33) -- (41);
+      \draw (41) -- node[edge label] {T} (43);
+      \draw (41) -- node[edge label] {F} (47);
+      \draw (47) -- (48);
+      \draw (48) -- node[edge label] {T} (49);
+      \draw (49) -- (50);
+      \draw (48) -- node[edge label] {F} (50);
+      \draw (50) -- node[edge label] {T} (51);
+      \draw (51) -- (52);
+      \draw (50) -- node[edge label] {F} (52);
+      \draw (52) -- node[edge label] {T} (53);
+      \draw (53) -- (55);
+      \draw (52) -- node[edge label] {F} (55);
+
+      \draw (55) -- node[edge label] {T} (63);
+      \draw (63) -- node[edge label] {T} (64);
+      \draw (64) -- (J63);
+      \draw (63) -- node[edge label] {F} (66);
+      \draw (66) -- (J63);
+
+      \draw (55) -- node[edge label] {F} (74);
+      \draw (74) -- node[edge label] {T} (75);
+      \draw (74) -- node[edge label] {F} (76);
+      \draw (76) -- node[edge label] {T} (77);
+      \draw (76) -- node[edge label] {F} (78);
+      \draw (78) -- node[edge label] {T} (79);
+      \draw (78) -- node[edge label] {F} (80);
+      \draw (80) -- node[edge label] {T} (81);
+      \draw (80) -- node[edge label] {F} (83);
+
+      \draw (83) -- (J80);
+      \draw (81) -- (J80);
+      \draw (79) to[bend left] (J80);
+      \draw (77) to[bend left] (J80);
+      \draw (75) to[bend left] (J80);
+
+      \draw (J63) to[bend left] (86);
+      \draw (J80) to[bend right=15] (86);
+      \draw (43) -- ++(-4.8,0) |- (86);
+
+      \draw (86) -- (X);
+    \end{tikzpicture}
+    \caption{CFG for \texttt{tritype.c}}
+    \label{fig:cfg}
+  \end{minipage}
+\end{figure}
 
 \end{document}
 

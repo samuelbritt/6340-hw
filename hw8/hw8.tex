@@ -25,7 +25,7 @@
 \usepackage[section]{placeins}
 \usepackage{flafter}
 \usepackage{pdfpages}
-\usepackage[showframe,hmargin=1.5in,vmargin=1in]{geometry}
+\usepackage[hmargin=1.5in,vmargin=1in]{geometry}
 \usepackage{url}
 \usepackage{hyperref}
 
@@ -203,7 +203,9 @@ of conditions necessary for MC/DC coverage, our suite achieves
 \SI{92.6}{\percent} coverage. These data are tabulated in
 Table~\ref{tab:MCDC-coverage}.
 
-The CFG for \code{tritype.c} can be seen in Figure~\ref{fig:cfg}.
+The CFG for \code{tritype.c} can be seen in Figure~\ref{fig:cfg}. The
+cyclomatic complexity is 11, obtained by counting the number of
+decision statements in the CFG and adding one.
 
 \newcommand\pass{\textsc{pass}}
 \newcommand\fail{\hi{\textsc{fail}}}
@@ -250,10 +252,9 @@ The CFG for \code{tritype.c} can be seen in Figure~\ref{fig:cfg}.
     \BigCenter{
     \begin{tabular}{c *{24}{c}}
       \toprule
-      \multirow{2}{*}{Test ID}
       & \multicolumn{24}{c}{Statement line number} \\
       \cmidrule(lr){2-25}
-      % Test ID
+      Test ID
               & 33       & 41       & 43       & 47       & 48       & 49       & 50       & 51       & 52       & 53       & 55       & 63       & 64       & 66       & 74       & 75       & 76       & 77       & 78       & 79       & 80       & 81       & 83       & 86            \\
       \midrule
       1       & \covered & \covered &          & \covered & \covered &          & \covered &          & \covered & \covered & \covered &          &          &          & \covered &          & \covered &          & \covered &          & \covered &           & \covered & \covered     \\

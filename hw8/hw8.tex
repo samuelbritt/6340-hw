@@ -25,7 +25,7 @@
 \usepackage[section]{placeins}
 \usepackage{flafter}
 \usepackage{pdfpages}
-\usepackage[hmargin=1.5in,vmargin=1in]{geometry}
+\usepackage[showframe,hmargin=1.5in,vmargin=1in]{geometry}
 \usepackage{url}
 \usepackage{hyperref}
 
@@ -205,35 +205,39 @@ Table~\ref{tab:MCDC-coverage}.
 
 The CFG for \code{tritype.c} can be seen in Figure~\ref{fig:cfg}.
 
+\newcommand\pass{\textsc{pass}}
+\newcommand\fail{\hi{\textsc{fail}}}
 \begin{table}[htbp]
   \centering
-  \begin{minipage}[t]{.8\linewidth}
+  \begin{minipage}[t]{\linewidth}
     \centering
     \caption{Test Suite}
     \label{tab:test_suite}
-    \begin{tabular}{c l c l}
+    \BigCenter{
+    \begin{tabular}{c l c l l}
       \toprule
-      Test ID & Reason for test & Input: $(i, j, k)$  & Expected Result \\
+      Test ID & Reason for test & Input: $(i, j, k)$  & Expected Output & Test Result\\
       \midrule
-      1  & Violation of triangle inequality & $(10,  1,  1)$        & invalid      \\
-      2  & Violation of triangle inequality & $( 1, 10,  1)$        & invalid      \\
-      3  & Violation of triangle inequality & $( 1,  1, 10)$        & invalid      \\
-      4  & Negative input                   & $(-1,  1,  1)$        & invalid      \\
-      5  & Negative input                   & $( 1, -1,  1)$        & invalid      \\
-      6  & Negative input                   & $( 1,  1, -1)$        & invalid      \\
-      7  & Zero input                       & $( 0,  1,  1)$        & invalid      \\
-      8  & Zero input                       & $( 1,  0,  1)$        & invalid      \\
-      9  & Zero input                       & $( 1,  1,  0)$        & invalid      \\
-      10 & Invalid input                    & $( \code{w},  1,  1)$ & invalid      \\
-      11 & Invalid input                    & $( 1,  \code{w},  1)$ & invalid      \\
-      12 & Invalid input                    & $( 1,  1,  \code{w})$ & invalid      \\
-      13 & Equilateral                      & $( 1,  1,  1)$        & equilateral  \\
-      14 & Scalene                          & $( 4,  3,  2)$        & scalene      \\
-      15 & Isosceles                        & $( 2,  2,  3)$        & isosceles    \\
-      16 & Isosceles                        & $( 2,  3,  2)$        & isosceles    \\
-      17 & Isosceles                        & $( 3,  2,  2)$        & isosceles    \\
+      1  & Violation of triangle inequality & $(10,  1,  1)$        & invalid      & \pass \\
+      2  & Violation of triangle inequality & $( 1, 10,  1)$        & invalid      & \pass \\
+      3  & Violation of triangle inequality & $( 1,  1, 10)$        & invalid      & \pass \\
+      4  & Negative input                   & $(-1,  1,  1)$        & invalid      & \pass \\
+      5  & Negative input                   & $( 1, -1,  1)$        & invalid      & \pass \\
+      6  & Negative input                   & $( 1,  1, -1)$        & invalid      & \pass \\
+      7  & Zero input                       & $( 0,  1,  1)$        & invalid      & \pass \\
+      8  & Zero input                       & $( 1,  0,  1)$        & invalid      & \pass \\
+      9  & Zero input                       & $( 1,  1,  0)$        & invalid      & \fail \\
+      10 & Invalid input                    & $( \code{w},  1,  1)$ & invalid      & \pass \\
+      11 & Invalid input                    & $( 1,  \code{w},  1)$ & invalid      & \pass \\
+      12 & Invalid input                    & $( 1,  1,  \code{w})$ & invalid      & \fail \\
+      13 & Equilateral                      & $( 1,  1,  1)$        & equilateral  & \pass \\
+      14 & Scalene                          & $( 4,  3,  2)$        & scalene      & \pass \\
+      15 & Isosceles                        & $( 2,  2,  3)$        & isosceles    & \pass \\
+      16 & Isosceles                        & $( 2,  3,  2)$        & isosceles    & \pass \\
+      17 & Isosceles                        & $( 3,  2,  2)$        & isosceles    & \pass \\
       \bottomrule
     \end{tabular}
+    } % Bigcenter
   \end{minipage}
 \end{table}
 

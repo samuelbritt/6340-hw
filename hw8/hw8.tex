@@ -162,6 +162,8 @@
 \DeclareMathOperator\pdom{pdom}
 \DeclareMathOperator\dom{dom}
 
+\usepackage{bm}
+\newcommand\coverage[2]{\textbf{\SI[detect-weight]{#1}{\percent} #2}}
 \newcommand\covered{\ensuremath{\checkmark}}
 \begin{document}
 \thispagestyle{empty}
@@ -191,21 +193,59 @@ Sam Britt                \hfill CS 6340      \\
 Shriram Swaminathan      \hfill Assignment 8 \\
 Sivaramachandran Ganesan \hfill Mar. 12, 2013
 
-Our test suite is shown in Table~\ref{tab:test_suite} below. We
-achieved \SI{100}{\percent} statement coverage with this test suite;
-Table~\ref{tab:statement-coverage} shows which tests cover each
-statement.
-
-Our test suite achieved \SI{65.8}{\percent} multiple condition
-coverage. The coverage, per condition, is listed in
-Table~\ref{tab:condition-coverage}. When considering just the subset
-of conditions necessary for MC/DC coverage, our suite achieves
-\SI{92.6}{\percent} coverage. These data are tabulated in
+Our test suite, along with the test results, is shown in
+Table~\ref{tab:test_suite} below. We achieved \coverage{100}{statement
+coverage} with this test suite; Table~\ref{tab:statement-coverage}
+shows which tests cover each statement. Our test suite achieved
+\coverage{65.8}{multiple condition coverage}; the coverage is
+tabulated in Table~\ref{tab:condition-coverage}.  When considering
+just the subset of conditions necessary for MC/DC coverage, our suite
+achieves \coverage{92.6}{MC/DC coverage}. These data are tabulated in
 Table~\ref{tab:MCDC-coverage}.
 
 The CFG for \code{tritype.c} can be seen in Figure~\ref{fig:cfg}. The
 cyclomatic complexity is 11, obtained by counting the number of
-decision statements in the CFG and adding one.
+decision statements in the CFG and adding one. We identified ten
+linearly independent paths from Table~\ref{tab:statement-coverage},
+resulting in \coverage{90.9}{basis path coverage}.
+
+The statement coverage results were obtained by using a debugger to
+step through an execution of the program for each test case, while
+marking which statements were executed. For multiple condition and
+MC/DC coverage, we used a similar procedure: after identifying all the
+truth vectors for each decision in the program, we stepped through
+each test case in a debugger and marked which truth vector was
+executed by each test. Some reasons for the low multiple condition
+coverage are:
+\begin{enumerate}
+  \item The test suite does not have a test case with multiple
+    negative inputs.
+  \item The test suite does not have as many test cases for scalene
+    output as required. Line 63 has three conditions and eight truth
+    vectors; our test suite covers only two of them.
+\end{enumerate}
+
+The program has a binary operator bugs at lines~41 and~63.  At
+line~41, the check should be for \code{k<=0} and not \code{k<0}.  This
+bug was identified by test case~9 for which inputs $(\code{i},
+\code{j}, \code{k})$ were $(1, 1, 0)$ and expected output was
+``invalid,'' but the actual output was found to be ``isosceles.''
+Similarly, at line~63, the condition should be \code{i+k<=j} and not
+\code{i+k<j}. However, this bug was not identified by our test suite;
+this is a result of the poor condition coverage of for the decision on
+line~63 (see Table~\ref{tab:condition-coverage}), as well as not
+properly testing the boundary conditions for violation of the triangle
+inequality; e.g., the case where $\code{i} + \code{k} = \code{j}$ for
+$\code{i}, \code{j}, \code{k} \ne 0$.
+
+The program accepts invalid inputs like character strings instead of
+strictly integer inputs. Test case~12 expects ``invalid'' as output,
+but the execution resulted in ``isosceles.'' This illustrates that
+input values are not validated properly by the program. However,
+tests~10 and~11 both passed, even though they should not have. This is
+because of the unpredictable nature of the bug---the compiler has left
+some variables undefined, and the result coincidentally caused the
+tests to pass.
 
 \newcommand\pass{\textsc{pass}}
 \newcommand\fail{\hi{\textsc{fail}}}
@@ -589,7 +629,7 @@ decision statements in the CFG and adding one.
 
       \draw (86) -- (X);
     \end{tikzpicture}
-    \caption{CFG for \texttt{tritype.c}}
+    \caption{CFG for \code{tritype.c}}
     \label{fig:cfg}
   \end{minipage}
 \end{figure}

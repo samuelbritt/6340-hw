@@ -197,7 +197,11 @@ Table~\ref{tab:statement-coverage} shows which tests cover each
 statement.
 
 Our test suite achieved \SI{65.8}{\percent} multiple condition
-coverage.
+coverage. The coverage, per condition, is listed in
+Table~\ref{tab:condition-coverage}. When considering just the subset
+of conditions necessary for MC/DC coverage, our suite achieves
+\SI{92.6}{\percent} coverage. These data are tabulated in
+Table~\ref{tab:MCDC-coverage}.
 
 The CFG for \code{tritype.c} can be seen in Figure~\ref{fig:cfg}.
 
@@ -381,6 +385,116 @@ The CFG for \code{tritype.c} can be seen in Figure~\ref{fig:cfg}.
       T & \covered & T &  &       && F &          & F & F & \\
       F & \covered & F &  &       && F & \covered & F & T & \\
         &          &   &  &       && F & \covered & T & F & \\
+        &          &   &  &       && T & \covered & T & T & \\
+      \bottomrule
+    \end{tabular}
+    } % Bigcenter
+  \end{minipage}
+\end{table}
+
+\begin{table}[htbp]
+  \setlength{\tabcolsep}{4pt}
+  \centering
+  \begin{minipage}[t]{\linewidth}
+    \centering
+    \caption{MC/DC Coverage, per Condition}
+    \label{tab:MCDC-coverage}
+    \BigCenter{
+    \begin{tabular}{c c *{3}{c} c @{\hskip .5cm} c c *{3}{c}}
+      \toprule
+      Decision
+      & Coverage
+      & \multicolumn{3}{c}{Conditions}
+      &
+      & Decision
+      & Coverage
+      & \multicolumn{3}{c}{Conditions}
+      \\
+      (Result)
+      &
+      & \multicolumn{3}{c}{(Possible Evaluations)}
+      &
+      & (Result)
+      &
+      & \multicolumn{3}{c}{(Possible Evaluations)}
+      \\
+      \cmidrule{1-5}
+      \cmidrule{7-11}
+      \\
+      Line 41
+      & Covered?
+      & \code{i<=0}
+      & \code{j<=0}
+      & \code{k<0}
+      &
+      & Line 63
+      & Covered?
+      & \code{i+j<=k}
+      & \code{j+k<=i}
+      & \code{i+k<j} \\
+      % Line 41                   % Line 63
+      \cmidrule(lr){1-5}          \cmidrule(lr){7-11}
+      F & \covered & F & F & F    && F & \covered & F & F & F \\
+      T & \covered & F & F & T    && T & \covered & F & F & T \\
+      T & \covered & F & T & F    && T &          & F & T & F \\
+      T & \covered & T & F & F    && T &          & T & F & F \\
+      \\
+      Line 48
+      & Covered?
+      & \code{i == j}
+      & &
+      &
+      & Line 74
+      & Covered?
+      & \code{triang>3} \\
+      % Line 48                   % Line 74
+      \cmidrule(lr){1-3}          \cmidrule(lr){7-9}
+      T & \covered & T  &  &      && T & \covered & T  &  &  \\
+      F & \covered & F  &  &      && F & \covered & F  &  &  \\
+      \\
+      Line 50
+      & Covered?
+      & \code{i==k}
+      & &
+      &
+      & Line 76
+      & Covered?
+      & \code{triang==1}
+      & \code{i+j>k} \\
+      % Line 50                   % Line 76
+      \cmidrule(lr){1-3}          \cmidrule(lr){7-10}
+      T & \covered & T &  &       && F & \covered & F & T & \\
+      F & \covered & F &  &       && F & \covered & T & F & \\
+        &          &   &  &       && T & \covered & T & T & \\
+      \\
+      Line 52
+      & Covered?
+      & \code{j==k}
+      & &
+      &
+      & Line 78
+      & Covered?
+      & \code{triang==2}
+      & \code{i+k>j} \\
+      % Line 52                   Line 78
+      \cmidrule(lr){1-3}          \cmidrule(lr){7-10}
+      T & \covered & T  &  &      && F & \covered & F & T & \\
+      F & \covered & F  &  &      && F & \covered & T & F & \\
+        &          &    &  &      && T & \covered & T & T & \\
+      \\
+      Line 55
+      & Covered?
+      & \code{triang==0}
+      & &
+      &
+      & Line 80
+      & Covered?
+      & \code{triang==3}
+      & \code{j+k>i} \\
+      % Line 55                   Line 80
+      \cmidrule(lr){1-3}          \cmidrule(lr){7-10}
+      T & \covered & T &  &       && F & \covered & F & T & \\
+      F & \covered & F &  &       && F & \covered & T & F & \\
         &          &   &  &       && T & \covered & T & T & \\
       \bottomrule
     \end{tabular}

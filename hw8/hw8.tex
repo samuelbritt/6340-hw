@@ -247,6 +247,19 @@ because of the unpredictable nature of the bug---the compiler has left
 some variables undefined, and the result coincidentally caused the
 tests to pass.
 
+
+Although we obtain a statement coverage of \SI{100}{\percent} with
+relatively little expense (17 test cases), we do not uncover the fault
+on line~63 in the program. Hence we believe a requirement of
+\SI{100}{\percent} statement coverage is not very strong.  A
+\SI{100}{100} MC/DC coverage would help in uncovering both the faults
+in the program. However, it would increase the expense and we would
+have to come up with additional test cases. One possible test case
+that we missed is: $\code{i} =2$, $\code{j}=5$, and $\code{k}=3$ which
+should produce an actual output of ``invalid'' but the program
+produces output ``scalene.'' As test manager, we will require our
+developers to test to \SI{100}{\percent} MC/DC coverage.
+
 \newcommand\pass{\textsc{pass}}
 \newcommand\fail{\hi{\textsc{fail}}}
 \begin{table}[htbp]

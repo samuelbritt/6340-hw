@@ -1,0 +1,389 @@
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[osf]{mathpazo}
+\usepackage{microtype}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{mathtools}
+\usepackage{bm}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage[pdftex]{lscape}
+\usepackage{lipsum}
+\usepackage{tikz}
+\usepackage{enumitem}
+\usepackage[alsoload=binary]{siunitx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{cancel}
+\usepackage{fancyvrb}
+\usepackage[section]{placeins}
+\usepackage{flafter}
+\usepackage{pdfpages}
+\usepackage[hmargin=1.5in,vmargin=1in]{geometry}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{}
+\usepackage{}
+\usepackage{} 
+
+% algorithms
+\let\oldgets\gets
+\usepackage{clrscode3e}
+\let\gets\oldgets
+
+% no section numbers
+\setcounter{secnumdepth}{-2}
+
+% a bit more compact, and fixes spacing issues
+\let\originalleft\left
+\let\originalright\right
+\renewcommand{\l}{\mathopen{}\mathclose\bgroup\originalleft}
+\renewcommand{\r}{\aftergroup\egroup\originalright}
+
+% commands
+\renewcommand\vec[1]{\bm{#1}}
+\renewcommand\epsilon{\varepsilon}
+\newcommand\bit{\ensuremath{\set{0,1}}}
+\newcommand\abs[1]{\l\vert #1 \r\vert}
+\newcommand\set[1]{\ensuremath{\l\{#1\r\}}}
+% redefine `\to` to use tikz arrows
+\renewcommand\to{%
+  \mathbin{\tikz[baseline=-.7ex] \draw[->] (0,0) -- +(.4,0);}%
+}
+
+% red todos
+\usepackage{marginnote}
+\usepackage{xifthen}% provides \isempty test
+\renewcommand\marginfont{\color{red}\footnotesize}
+
+% Arg 1: vertical shift, Arg 2: content
+\newcommand\Todo[2][]{{\color{red}$^\dagger$}\marginnote{$^\dagger$#2}[#1]}
+
+% wrapper for \Todo: can leave content and/or shift empty
+\newcommand{\todo}[2][0pt]
+  {%
+  \ifthenelse{ \isempty{#2} }%
+    {%
+    \Todo[#1]{\textsc{todo}}%
+    }%
+    {%
+    \Todo[#1]{#2}%
+    }%
+  }
+
+\usetikzlibrary
+  {
+  positioning,
+  calc,
+  intersections,
+  backgrounds,
+  arrows,
+  shapes.misc,
+  shapes.geometric,
+  }
+
+\tikzset
+  {
+  ->,
+  >=latex',
+  shorten >=.5pt,
+  node distance=.8cm and .8cm,
+  fork/.style= {node distance=.8cm and #1},
+  wide fork/.style={fork=1.6cm},
+  block/.style=
+    {
+    draw,
+    inner sep=.3em,
+    rounded rectangle,
+    text height=1.3ex,
+    text depth=.2ex,
+    minimum size=3.6ex,
+    },
+  terminal/.style=
+    {
+    block,
+    rectangle,
+    text height=1.5ex,
+    text depth=.25ex,
+    },
+  joint/.style={fill=black,circle,inner sep=0,minimum size=5pt},
+  region/.style=
+    {
+    draw,
+    trapezium,
+    },
+  selected/.style={fill=gray!30},
+  edge label/.style=
+    {
+    auto=false,
+    anchor=mid,
+    fill=white,
+    font=\footnotesize,
+    inner sep=.25ex,
+    },
+  data edge/.style={red},
+  call edge/.style={dashed},
+  param edge/.style={blue},
+  trans edge/.style={green!50!black},
+  inline center/.style={baseline=-.6ex},
+  }
+
+\newcommand\SampleEdge[1]{%
+  \tikz[inline center] \draw[#1] (0,0) -- (.7,0);%
+}
+
+% table customizaton
+\newcommand\newrow{\\\addlinespace}
+
+% center columns
+\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
+
+% Centers giant figures, tables, etc, on the page, even within nested
+% enumerates/itemize environments
+\makeatletter
+\newcommand\BigCenter[1]{\par\noindent\hspace*{-\@totalleftmargin}\makebox[\textwidth]{#1}}
+\makeatother
+
+% Code listings
+\usepackage{listings}
+\usepackage{caption}
+\lstset
+  {
+  language=C,
+  columns=flexible,
+  %basicstyle=\ttfamily,
+  %keywordstyle=\bfseries,
+  % identifierstyle=,
+  commentstyle=\itshape,
+  stringstyle=\ttfamily,
+  numbers=left,
+  numberstyle=\footnotesize,
+  showstringspaces=false,
+  escapeinside={(*}{*)}
+  }
+\DeclareCaptionType{listing}[Listing]
+\newenvironment{captionedlisting}{}{}
+
+% highlight
+\newcommand\hi[1]{\textcolor{red}{#1}}
+
+% data analysis
+\newcommand\bottom{\ensuremath{\perp}}
+\newcommand\union{\bigcup}
+\newcommand\Kill{\texttt{KILL}}
+\newcommand\Gen{\texttt{GEN}}
+\newcommand\codefamily{\ttfamily}  % use in tables
+\newcommand\code[1]{\text{\codefamily #1}}
+\newcommand\blk[1]{\text{#1}}
+\DeclareMathOperator\pdom{pdom}
+\DeclareMathOperator\dom{dom}
+
+\usepackage{bm}
+\newcommand\coverage[2]{\textbf{\SI[detect-weight]{#1}{\percent} #2}}
+\newcommand\covered{\ensuremath{\checkmark}}
+
+\begin{document}
+\thispagestyle{empty}
+
+\includepdf
+  [
+  pages=1,
+  pagecommand=
+    {
+    \begin{tikzpicture}[remember picture, overlay]
+      \node[text width=6.3in, text height=2.6in]
+      at (current page.north east)
+      {\large
+      Sam Britt, Shriram Swaminathan,\\[1.5em]
+      and Sivaramachandran Ganesan
+      };
+    \end{tikzpicture}
+    }
+  ]
+  {Assignment9ProblemSet6}
+
+\clearpage
+\pagenumbering{arabic}
+
+\noindent
+Sam Britt                \hfill CS 6340      \\
+Shriram Swaminathan      \hfill Assignment 9 \\
+Sivaramachandran Ganesan \hfill Mar. 31, 2013
+
+\section{Random Test-data Generation}
+\label{sec:random_test_data_generation}
+
+Our \verb|tritype_single_conditions.c| is in Listing~\ref{lst:tritype-single} below. Our random test generation program is in Listing~\ref{lst:rand-test-gen}. The test suite it produced is in Table~\ref{tab:test-suite}. We determined our branch coverage be \SI{41.18}{\percent}. This value was obtained by using a debugger to step through an execution of the program for each test case, while marking which branches were taken. This number was then divided by the total number of branches in the program ($34$) to obtain the coverage.
+
+% section random_test_data_generation (end)
+
+\section{Path-oriented Test-data Generation}
+\label{sec:path_oriented_test_data_generation}
+\newcommand\false{\textsc{False}}
+\newcommand\true{\textsc{True}}
+
+We decided to target the \false\ evaluation of the branch on line~\ref{ln:target-tri=0} using symbolic execution. We see that the execution of our target line~\ref{ln:target-tri=0} is conditionally dependent on the branches on lines~\ref{ln:i=0}, \ref{ln:j>=0}, and~\ref{ln:k>0} evaluating to \false. Therefore, in order for execution to reach line~\ref{ln:tri=0}, the input must satisfy 
+\begin{equation}
+  \label{eq:first-cond}
+  (\code{i} > 0) \land
+  (\code{j} > 0) \land
+  (\code{k} >= 0).
+\end{equation}
+
+Continuing, we see that \code{triang} is set to $0$ on line~\ref{ln:tri=0}, and there are branches on lines~\ref{ln:i=j}, \ref{ln:i=k}, and~\ref{ln:j=k}. All three of these branches will be executed before execution reaches the target, which means there are eight possible paths from line~\ref{ln:tri=0} to the target on line~\ref{ln:target-tri=0}, one for each combination of possible evaluations of the branches. Symbolically, we evaluated each of these eight branches and determined the value of the \code{triang} variable at the time execution reaches line~\ref{ln:target-tri=0}. (Because the value of \code{triang} does not depend directly on the values of the inputs aside from its conditional dependence, we are able to evaluate \code{triang} concretely.) We find that, if one or more of the three branches evaluates to \true, the value of \code{triang} is different from $0$ at the execution of the target branch at line~\ref{ln:target-tri=0}; that is, the only way the target evaluates to \true\ is if all three branches evaluate to \false. Therefore, our target will be satisfied if any condition is \true---we take the branch at line~\ref{ln:j=k} arbitrarily. Combining with the condition in Eqn.~\eqref{eq:first-cond}, we must choose inputs that satisfy
+\begin{equation*}
+  (\code{i} > 0) \land
+  (\code{j} > 0) \land
+  (\code{k} >= 0) \land
+  (\code{i} \ne \code{j}) \land
+  (\code{i} \ne \code{k}) \land
+  (\code{j} = \code{k}).
+\end{equation*}
+Solving this constraint is straightforward; we took $(\code{i}, \code{j}, \code{k}) = (1, 2, 2)$.
+
+% section path_oriented_test_data_generation (end)
+
+
+\begin{table}[htbp]
+  \centering
+  \begin{minipage}[t]{\linewidth}
+    \centering
+    \caption{Test Suite, generated randomly}
+    \label{tab:test-suite}
+    \sisetup
+      {
+        table-figures-integer=10,
+        table-number-alignment=right
+      }
+    \BigCenter{
+    \begin{tabular}{c l SSS l}
+      \toprule
+      Test ID  & Reason for test & \multicolumn{3}{c}{Generated Input} & Expected Output \\
+      \cmidrule(lr){3-5}
+      &
+      & \multicolumn{1}{c}{$i$}
+      & \multicolumn{1}{c}{$j$}
+      & \multicolumn{1}{c}{$k$} \\
+      \midrule
+       1 & Random & -1122822091 & -1226680922 & -193961734  & Invalid \\
+       2 & Random & -1182307965 & -154439951  & -1240139973 & Invalid \\
+       3 & Random & 1402051776  & 914798430   & 1612220316  & Invalid \\
+       4 & Random & -496854896  & -449175289  & -1180638653 & Invalid \\
+       5 & Random & -1987922192 & -1484115204 & -266467487  & Invalid \\
+       6 & Random & 883411989   & 305256757   & 945915839   & Scalene \\
+       7 & Random & -653520881  & -95223433   & -599427703  & Invalid \\
+       8 & Random & 1167814945  & 678101484   & -1475198278 & Invalid \\
+       9 & Random & -737454116  & 1299871708  & 1347433141  & Invalid \\
+      10 & Random & 1443280107  & 2141951683  & -562629834  & Invalid \\
+      11 & Random & 688264798   & 1650225101  & 1408651086  & Invalid \\
+      12 & Random & -1492740046 & 429397449   & -722649152  & Invalid \\
+      13 & Random & 775843237   & 882820983   & 1825593824  & Invalid \\
+      14 & Random & 1596782873  & 35105140    & 1602193698  & Invalid \\
+      15 & Random & -1082197646 & 422926318   & -1677901821 & Invalid \\
+      \bottomrule
+    \end{tabular}
+    } % end BigCenter
+  \end{minipage}
+\end{table}
+
+\newpage
+\begin{captionedlisting}
+  \captionof{listing}{Tritype, altered to execute only single conditions.}
+  \label{lst:tritype-single}
+  \begin{lstlisting}
+#include <stdio.h>
+main() {
+    int i, j, k, triang;
+    scanf("%d %d %d", &i, &j, &k);
+
+    if (i <= 0) {                 (*\label{ln:i=0}*)
+        triang = 4;
+    } else if (j <= 0) {          (*\label{ln:j>=0}*)
+        triang = 4;
+    } else if (k < 0) {           (*\label{ln:k>0}*)
+        triang = 4;
+    } else {
+        triang = 0;               (*\label{ln:tri=0}*)
+        if (i == j)               (*\label{ln:i=j}*)
+            triang += 1;
+        if (i == k)               (*\label{ln:i=k}*) 
+            triang += 2;
+        if (j == k)               (*\label{ln:j=k}*) 
+            triang += 3;
+
+        if (triang == 0) {        (*\label{ln:target-tri=0}*)
+            /* Confirm it's a legal triangle before declaring it to be scalene */
+            if ( i+j <= k ) 
+                triang = 4;
+            else if (j+k <= i)
+                triang = 4;
+            else if (i+k < j)
+                triang = 4;
+            else 
+                triang = 1;
+        } else {
+            /* Confirm it's a legal triangle before declaring it to be isosceles or equilateral */
+            if (triang > 3) {
+                triang = 3;
+            } else if (triang == 1) {
+                if (i+j > k) 
+                    triang  = 2;
+            } else if (triang == 2) {
+                if (i+k > j)
+                    triang = 2;
+            } else if (triang == 3) {
+                if (j+k > i)
+                    triang = 2;
+            } else {
+                triang = 4;
+            }
+        }
+    } 
+    printf("triang = %d\n", triang);
+}
+  \end{lstlisting}
+\end{captionedlisting}
+
+\begin{captionedlisting}
+  \captionof{listing}{The random test generation program}
+  \label{lst:rand-test-gen}
+  \begin{lstlisting}
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+#define MAX_TESTS 15
+
+/** Returns 1 or -1 picked at random */
+int rand_sign() {
+    // return 1 if odd, -1 if even
+    return rand() % 2 ? 1 : -1;
+}
+
+/** Returns a random number between -RAND_MAX and RAND_MAX */
+int random_int() {
+    int r = rand();
+    int sign = rand_sign();
+    return sign * r;
+}
+
+int main(int argc, char const *argv[]) {
+    srand(time(NULL));
+    int i, j, k, t;
+    for (t = 0; t < MAX_TESTS; ++t) {
+        i = random_int();
+        j = random_int();
+        k = random_int();
+        printf("\"Test %2d:\" %13d %13d %13d\n", t+1, i, j, k);
+    }
+}
+  \end{lstlisting}
+\end{captionedlisting}
+
+\end{document}

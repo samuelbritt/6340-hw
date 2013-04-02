@@ -233,14 +233,14 @@ We decided to target the \false\ evaluation of the branch on line~\ref{ln:target
   \label{eq:first-cond}
   (\code{i} > 0) \land
   (\code{j} > 0) \land
-  (\code{k} >= 0).
+  (\code{k} \ge 0).
 \end{equation}
 
 Continuing, we see that \code{triang} is set to $0$ on line~\ref{ln:tri=0}, and there are branches on lines~\ref{ln:i=j}, \ref{ln:i=k}, and~\ref{ln:j=k}. All three of these branches will be executed before execution reaches the target, which means there are eight possible paths from line~\ref{ln:tri=0} to the target on line~\ref{ln:target-tri=0}, one for each combination of possible evaluations of the branches. Symbolically, we evaluated each of these eight branches and determined the value of the \code{triang} variable at the time execution reaches line~\ref{ln:target-tri=0}. (Because the value of \code{triang} does not depend directly on the values of the inputs aside from its conditional dependence, we are able to evaluate \code{triang} concretely.) We find that, if one or more of the three branches evaluates to \true, the value of \code{triang} is different from $0$ at the execution of the target branch at line~\ref{ln:target-tri=0}; that is, the only way the target evaluates to \true\ is if all three branches evaluate to \false. Therefore, our target will be satisfied if any condition is \true---we take the branch at line~\ref{ln:j=k} arbitrarily. Combining with the condition in Eqn.~\eqref{eq:first-cond}, we must choose inputs that satisfy
 \begin{equation*}
   (\code{i} > 0) \land
   (\code{j} > 0) \land
-  (\code{k} >= 0) \land
+  (\code{k} \ge 0) \land
   (\code{i} \ne \code{j}) \land
   (\code{i} \ne \code{k}) \land
   (\code{j} = \code{k}).
@@ -259,33 +259,37 @@ Solving this constraint is straightforward; we took $(\code{i}, \code{j}, \code{
     \sisetup
       {
         table-figures-integer=10,
+        table-figures-decimal=0,
         table-number-alignment=right
       }
     \BigCenter{
-    \begin{tabular}{c l SSS l}
+    \begin{tabular}{S[table-figures-integer=2] l SSS l}
       \toprule
-      Test ID  & Reason for test & \multicolumn{3}{c}{Generated Input} & Expected Output \\
+      % Test ID  & Reason for test & \multicolumn{3}{c}{Generated Input} & Expected Output \\
+      && \multicolumn{3}{c}{Generated Input} \\
       \cmidrule(lr){3-5}
-      &
-      & \multicolumn{1}{c}{$i$}
-      & \multicolumn{1}{c}{$j$}
-      & \multicolumn{1}{c}{$k$} \\
+      {Test ID}
+      & Reason for test 
+      & {$i$}
+      & {$j$}
+      & {$k$}
+      & Expected Output \\
       \midrule
-       1 & Random & -1122822091 & -1226680922 & -193961734  & Invalid \\
-       2 & Random & -1182307965 & -154439951  & -1240139973 & Invalid \\
-       3 & Random & 1402051776  & 914798430   & 1612220316  & Invalid \\
-       4 & Random & -496854896  & -449175289  & -1180638653 & Invalid \\
-       5 & Random & -1987922192 & -1484115204 & -266467487  & Invalid \\
-       6 & Random & 883411989   & 305256757   & 945915839   & Scalene \\
-       7 & Random & -653520881  & -95223433   & -599427703  & Invalid \\
-       8 & Random & 1167814945  & 678101484   & -1475198278 & Invalid \\
-       9 & Random & -737454116  & 1299871708  & 1347433141  & Invalid \\
-      10 & Random & 1443280107  & 2141951683  & -562629834  & Invalid \\
-      11 & Random & 688264798   & 1650225101  & 1408651086  & Invalid \\
-      12 & Random & -1492740046 & 429397449   & -722649152  & Invalid \\
-      13 & Random & 775843237   & 882820983   & 1825593824  & Invalid \\
-      14 & Random & 1596782873  & 35105140    & 1602193698  & Invalid \\
-      15 & Random & -1082197646 & 422926318   & -1677901821 & Invalid \\
+       1 & Random & -1122822091 & -1226680922 &  -193961734 & Invalid \\
+       2 & Random & -1182307965 &  -154439951 & -1240139973 & Invalid \\
+       3 & Random &  1402051776 &   914798430 &  1612220316 & Scalene \\
+       4 & Random &  -496854896 &  -449175289 & -1180638653 & Invalid \\
+       5 & Random & -1987922192 & -1484115204 &  -266467487 & Invalid \\
+       6 & Random &   883411989 &   305256757 &   945915839 & Scalene \\
+       7 & Random &  -653520881 &   -95223433 &  -599427703 & Invalid \\
+       8 & Random &  1167814945 &   678101484 & -1475198278 & Invalid \\
+       9 & Random &  -737454116 &  1299871708 &  1347433141 & Invalid \\
+      10 & Random &  1443280107 &  2141951683 &  -562629834 & Invalid \\
+      11 & Random &   688264798 &  1650225101 &  1408651086 & Scalene \\
+      12 & Random & -1492740046 &   429397449 &  -722649152 & Invalid \\
+      13 & Random &   775843237 &   882820983 &  1825593824 & Invalid \\
+      14 & Random &  1596782873 &    35105140 &  1602193698 & Scalene \\
+      15 & Random & -1082197646 &   422926318 & -1677901821 & Invalid \\
       \bottomrule
     \end{tabular}
     } % end BigCenter

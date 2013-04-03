@@ -187,6 +187,7 @@
 \usepackage{bm}
 \newcommand\coverage[2]{\textbf{\SI[detect-weight]{#1}{\percent} #2}}
 \newcommand\covered{\ensuremath{\checkmark}}
+\newcommand\notcovered{--}
 
 \begin{document}
 \thispagestyle{empty}
@@ -219,7 +220,7 @@ Sivaramachandran Ganesan \hfill Mar. 31, 2013
 \section{Random Test-data Generation}
 \label{sec:random_test_data_generation}
 
-Our \verb|tritype_single_conditions.c| is in Listing~\ref{lst:tritype-single} below. Our random test generation program is in Listing~\ref{lst:rand-test-gen}. The test suite it produced is in Table~\ref{tab:test-suite}. We determined our branch coverage be \SI{41.18}{\percent}. This value was obtained by using a debugger to step through an execution of the program for each test case, while marking which branches were taken. This number was then divided by the total number of branches in the program ($34$) to obtain the coverage.
+Our \verb|tritype_single_conditions.c| is in Listing~\ref{lst:tritype-single} below. Our random test generation program is in Listing~\ref{lst:rand-test-gen}, and the test suite it produced is in Table~\ref{tab:test-suite}. We determined our branch coverage be \SI{41.18}{\percent}. This value was obtained by using a debugger to step through an execution of the program for each test case, while marking which branches were taken. This number was then divided by the total number of branches in the program ($34$) to obtain the coverage. The coverage of each branch evaluation, broken down by test case, is shown in Table~\ref{tab:test-coverage}, where a ``\covered{}'' symbol indicates that a particular evaluation of a branch statement was covered by the test, and a ``\notcovered{}'' (or a blank) indicates that it the branch was not covered.
 
 % section random_test_data_generation (end)
 
@@ -296,6 +297,193 @@ Solving this constraint is straightforward; we took $(\code{i}, \code{j}, \code{
   \end{minipage}
 \end{table}
 
+\begin{table}[htbp]
+  % \setlength{\tabcolsep}{4pt}
+  \centering
+  \begin{minipage}[t]{\linewidth}
+    \centering
+    \caption{Branch Coverage by Test}
+    \label{tab:test-coverage}
+    \sisetup
+      {
+        table-figures-integer=2,
+        table-figures-decimal=0,
+        table-number-alignment=center
+      }
+    \BigCenter{
+    \begin{tabular}{S *{17}{c@{\extracolsep{3pt}}c}}
+      \toprule
+      & \multicolumn{34}{c}{Branch Statement Line Number} \\
+      \cmidrule{2-35}
+      & \multicolumn{2}{c}{\ref{cond1}}
+      & \multicolumn{2}{c}{\ref{cond2}}
+      & \multicolumn{2}{c}{\ref{cond3}}
+      & \multicolumn{2}{c}{\ref{cond4}}
+      & \multicolumn{2}{c}{\ref{cond5}}
+      & \multicolumn{2}{c}{\ref{cond6}}
+      & \multicolumn{2}{c}{\ref{cond7}}
+      & \multicolumn{2}{c}{\ref{cond8}}
+      & \multicolumn{2}{c}{\ref{cond9}}
+      & \multicolumn{2}{c}{\ref{cond10}}
+      & \multicolumn{2}{c}{\ref{cond11}}
+      & \multicolumn{2}{c}{\ref{cond12}}
+      & \multicolumn{2}{c}{\ref{cond13}}
+      & \multicolumn{2}{c}{\ref{cond14}}
+      & \multicolumn{2}{c}{\ref{cond15}}
+      & \multicolumn{2}{c}{\ref{cond16}}
+      & \multicolumn{2}{c}{\ref{cond17}}
+      \\
+      \cmidrule(lr){2-3}
+      \cmidrule(lr){4-5}
+      \cmidrule(lr){6-7}
+      \cmidrule(lr){8-9}
+      \cmidrule(lr){10-11}
+      \cmidrule(lr){12-13}
+      \cmidrule(lr){14-15}
+      \cmidrule(lr){16-17}
+      \cmidrule(lr){18-19}
+      \cmidrule(lr){20-21}
+      \cmidrule(lr){22-23}
+      \cmidrule(lr){24-25}
+      \cmidrule(lr){26-27}
+      \cmidrule(lr){28-29}
+      \cmidrule(lr){30-31}
+      \cmidrule(lr){32-33}
+      \cmidrule(lr){34-35}
+      {Test ID}
+      & T & F % 1
+      & T & F % 2
+      & T & F % 3
+      & T & F % 4
+      & T & F % 5
+      & T & F % 6
+      & T & F % 7
+      & T & F % 8
+      & T & F % 9
+      & T & F % 10
+      & T & F % 11
+      & T & F % 12
+      & T & F % 13
+      & T & F % 14
+      & T & F % 15
+      & T & F % 16
+      & T & F % 17
+      \\
+      \midrule
+      1
+      & \covered & \notcovered % 1
+      \\
+      2
+      & \covered & \notcovered  % 1
+      \\
+      3
+      & \notcovered & \covered  % 1
+      & \notcovered & \covered  % 2
+      & \notcovered & \covered  % 3
+      & \notcovered & \covered  % 4
+      & \notcovered & \covered  % 5
+      & \notcovered & \covered  % 6
+      & \covered & \notcovered  % 7
+      & \covered & \notcovered  % 8
+      \\
+      4
+      & \covered & \notcovered  % 1
+      \\
+      5
+      & \covered & \notcovered  % 1
+      \\
+      6
+      & \notcovered & \covered  % 1
+      & \notcovered & \covered  % 2
+      & \notcovered & \covered  % 3
+      & \notcovered & \covered  % 4
+      & \notcovered & \covered  % 5
+      & \notcovered & \covered  % 6
+      & \covered & \notcovered  % 7
+      & \notcovered & \covered  % 8
+      & \notcovered & \covered  % 9
+      & \notcovered & \covered  % 10
+      \\
+      7
+      & \covered & \notcovered  % 1
+      \\
+      8
+      & \notcovered & \covered  % 1
+      & \notcovered & \covered  % 2
+      & \covered & \notcovered  % 3
+      \\
+      9
+      & \covered & \notcovered  % 1
+      \\
+      10
+      & \notcovered & \covered  % 1
+      & \notcovered & \covered  % 2
+      & \covered &  \notcovered % 3
+      \\
+      11
+      & \notcovered & \covered  % 1
+      & \notcovered & \covered  % 2
+      & \notcovered & \covered  % 3
+      & \notcovered & \covered  % 4
+      & \notcovered & \covered  % 5
+      & \notcovered & \covered  % 6
+      & \covered &  \notcovered % 7
+      & \covered &  \notcovered % 8
+      \\
+      12
+      & \covered &  \notcovered % 1
+      \\
+      13
+      & \notcovered & \covered  % 1
+      & \notcovered & \covered  % 2
+      & \notcovered & \covered  % 3
+      & \notcovered & \covered  % 4
+      & \notcovered & \covered  % 5
+      & \notcovered & \covered  % 6
+      & \covered & \notcovered  % 7
+      & \covered & \notcovered  % 8
+      \\
+      14
+      & \notcovered & \covered  % 1
+      & \notcovered & \covered  % 2
+      & \notcovered & \covered  % 3
+      & \notcovered & \covered  % 4
+      & \notcovered & \covered  % 5
+      & \notcovered & \covered  % 6
+      & \covered & \notcovered  % 7
+      & \notcovered & \covered  % 8
+      & \notcovered & \covered  % 8
+      & \covered & \notcovered  % 10
+      \\
+      15
+      & \covered & \notcovered  % 1
+      \\
+      \midrule
+      {Total}
+      & \covered    & \covered    % 1
+      & \notcovered & \covered    % 2
+      & \covered    & \covered    % 3
+      & \notcovered & \covered    % 4
+      & \notcovered & \covered    % 5
+      & \notcovered & \covered    % 6
+      & \covered    & \notcovered % 7
+      & \covered    & \covered    % 8
+      & \notcovered & \covered    % 9
+      & \covered    & \covered    % 10
+      & \notcovered & \notcovered % 11
+      & \notcovered & \notcovered % 12
+      & \notcovered & \notcovered % 13
+      & \notcovered & \notcovered % 14
+      & \notcovered & \notcovered % 15
+      & \notcovered & \notcovered % 16
+      & \notcovered & \notcovered % 17
+      \\
+      \bottomrule
+    \end{tabular}
+    } % BigCenter
+  \end{minipage}
+\end{table}
+
 \newpage
 \begin{captionedlisting}
   \captionof{listing}{Tritype, altered to execute only single conditions.}
@@ -306,43 +494,43 @@ main() {
     int i, j, k, triang;
     scanf("%d %d %d", &i, &j, &k);
 
-    if (i <= 0) {                 (*\label{ln:i=0}*)
+    if (i <= 0) {                       (*\label{cond1} \label{ln:i=0}*)
         triang = 4;
-    } else if (j <= 0) {          (*\label{ln:j>=0}*)
+    } else if (j <= 0) {                (*\label{cond2} \label{ln:j>=0}*)
         triang = 4;
-    } else if (k < 0) {           (*\label{ln:k>0}*)
+    } else if (k < 0) {                 (*\label{cond3} \label{ln:k>0}*)
         triang = 4;
     } else {
-        triang = 0;               (*\label{ln:tri=0}*)
-        if (i == j)               (*\label{ln:i=j}*)
+        triang = 0;                     (*              \label{ln:tri=0}*)
+        if (i == j)                     (*\label{cond4} \label{ln:i=j}*)
             triang += 1;
-        if (i == k)               (*\label{ln:i=k}*) 
+        if (i == k)                     (*\label{cond5} \label{ln:i=k}*) 
             triang += 2;
-        if (j == k)               (*\label{ln:j=k}*) 
+        if (j == k)                     (*\label{cond6} \label{ln:j=k}*) 
             triang += 3;
 
-        if (triang == 0) {        (*\label{ln:target-tri=0}*)
+        if (triang == 0) {              (*\label{cond7} \label{ln:target-tri=0}*)
             /* Confirm it's a legal triangle before declaring it to be scalene */
-            if ( i+j <= k ) 
+            if ( i+j <= k )             (*\label{cond8}*)
                 triang = 4;
-            else if (j+k <= i)
+            else if (j+k <= i)          (*\label{cond9}*)
                 triang = 4;
-            else if (i+k < j)
+            else if (i+k < j)           (*\label{cond10}*)
                 triang = 4;
             else 
                 triang = 1;
         } else {
             /* Confirm it's a legal triangle before declaring it to be isosceles or equilateral */
-            if (triang > 3) {
+            if (triang > 3) {           (*\label{cond11}*)
                 triang = 3;
-            } else if (triang == 1) {
-                if (i+j > k) 
+            } else if (triang == 1) {   (*\label{cond12}*)
+                if (i+j > k)            (*\label{cond13}*)
                     triang  = 2;
-            } else if (triang == 2) {
-                if (i+k > j)
+            } else if (triang == 2) {   (*\label{cond14}*)
+                if (i+k > j)            (*\label{cond15}*)
                     triang = 2;
-            } else if (triang == 3) {
-                if (j+k > i)
+            } else if (triang == 3) {   (*\label{cond16}*)
+                if (j+k > i)            (*\label{cond17}*)
                     triang = 2;
             } else {
                 triang = 4;
